@@ -1,0 +1,11 @@
+body {
+    background-color: none !important;
+    background: none !important;
+    margin-top: 40px;
+}
+
+
+
+.highcharts-container svg{
+	width: 1000px !important;
+}

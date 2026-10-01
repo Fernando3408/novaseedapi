@@ -1,0 +1,54 @@
+<input type="hidden" name="crossing" value="1">
+<div id="content-cruce">
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-4">
+            <div class="form-group">
+                <strong>Madre</strong>
+                {!! Form::select('mother_id', $varities,null,['class' => 'form-control required','placeholder' => 'Selecciona Variedad']); !!}
+            </div>
+        </div>
+        <div class="col-lg-1">
+            <button type="button" class="btn btn-warning" style="margin-top: 19px" id="find-btn"><i class="fa fa-search"></i></button>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-4">
+            <div class="form-group">
+                <strong>Padre</strong>
+                {!! Form::select('father_id', $varities,null,['class' => 'form-control required','placeholder' => 'Selecciona Variedad']); !!}
+            </div>
+        </div>
+        <div class="col-lg-1">
+            <button type="button"  class="btn btn-warning" style="margin-top: 19px"><i class="fa fa-search"></i></button>
+        </div>
+        <div class="col-xs-6 col-sm-6 col-md-2">
+            <div class="form-group">
+                <strong>Año:</strong>
+                {!! Form::text('year', null, array('placeholder' => 'Ingrese Año de cruce','class' => 'form-control  required')) !!}
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12">
+            <div class="form-group">
+                <strong>Objetivo del cruce:</strong>
+                <textarea name="observation"  cols="30" rows="10" class="form-control required"></textarea>
+            </div>
+        </div>
+    </div>
+</div>
+<!--
+<div class="row">
+    
+</div> 
+-->
+
+<script>
+    $(document).ready(function(){
+        $("input[name=cruce]").click(function(){
+            if ($("input[name=cruce][value=1]").is(":checked")) {
+                $("#content-cruce").show()
+            }else{
+                 $("#content-cruce").hide()
+            }
+        })
+
+        $("select").select2();
+    })
+</script>

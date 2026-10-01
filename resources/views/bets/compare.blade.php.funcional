@@ -1,0 +1,857 @@
+@extends('layouts.app')
+@section('content')
+<?php
+$titulo = "{{ $player1 }} vs {{ $player2 }}";
+?>
+<title><?= htmlspecialchars($titulo) ?></title>
+<!-- Formulario de filtrado por goles HT (ya existente) -->
+<div class="container text-center my-4">
+    <form method="GET" action="{{ url('bets_compare') }}">
+        <h2>{{ $player1 }} vs {{ $player2 }}</h2>
+        <div class="row justify-content-center mt-3">
+            <div class="col-md-4">
+                <label for="ht1">{{ $player1 }} Goles HT</label>
+                <input type="number" name="ht1" id="ht1" class="form-control" value="{{ request('ht1') }}">
+                <select name="team1" id="team1" class="form-control" style="margin-top: 25px;">
+	                <option value="">-- Selecciona equipo --</option>
+					  @foreach($teams as $cleaned => $original)
+					    <option value="{{ $cleaned }}">{{ $original }}</option>
+					  @endforeach
+				</select>
+            </div>
+            <div class="col-md-4">
+                <label for="ht2">{{ $player2 }} Goles HT</label>
+                <input type="number" name="ht2" id="ht2" class="form-control" value="{{ request('ht2') }}">
+                <select name="team2" id="team2" class="form-control" style="margin-top: 25px;">
+				<option value="">-- Selecciona equipo --</option>
+				  @foreach($teams as $cleaned => $original)
+				    <option value="{{ $cleaned }}">{{ $original }}</option>
+				  @endforeach
+				</select>
+            </div>
+        </div>
+        <!-- Enviar también los players -->
+        <input type="hidden" name="player1" value="{{ $player1 }}">
+        <input type="hidden" name="player2" value="{{ $player2 }}">
+        <button type="submit" class="btn btn-primary mt-3">Filtrar</button>
+    </form>
+</div>
+
+<!-- Modal para el detalle de partidos -->
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="detailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="detailModalLabel">Detalle de Partidos</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+         <!-- Aquí se cargará el contenido vía AJAX -->
+         <div id="modalDetailContent"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style type="text/css">
+	@media (min-width: 1400px){
+		.m-container.m-container--responsive.m-container--xxl {
+		    width: 100vw!important;
+		}
+	}
+</style>
+<div class="m-portlet m-portlet--head-solid-bg m-portlet--rounded">
+    <div class="m-portlet__body">
+    	<div class="row">
+
+            <!-- Tabla 1: Data para player1 -->
+    		<div class="col-md-6">
+    			<table class="dttable table table-striped- table-bordered table-hover table-checkable">
+	                <thead>
+	                    <tr>
+	                    	<th>Tipo</th>
+	                        <th>Player</th>
+	                        <th>Partidos</th>
+	                        <th>0.5%</th>
+	                        <th>1.5%</th>
+	                        <th>2.5%</th>
+	                        <th>3.5%</th>
+	                        <th>4.5%</th>
+	                        <th>5.5%</th>
+	                        <th>6.5%</th>
+	                        <th>SP 0.5%</th>
+	                        <th>SP 1.5%</th>
+	                        <th>SP 2.5%</th>
+	                        <th>SP 3.5%</th>
+	                        <th>SP 4.5%</th>
+	                        <th>SP 5.5%</th>
+	                        <th>SP 6.5%</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                    @if(!empty(@$data_p1))
+	                        @foreach(@$data_p1 as $period => $dx)
+	                        	@foreach($dx as $p1d1)
+	                        	<tr>
+	                        		@php
+	                        			$p1d1 = (array)$p1d1;
+	                                    // Cálculos (usando variables únicas ya implementadas)
+	                                    if($p1d1['partidos_jugados'] > 0){
+	                                        @$por_05_p1 = round($p1d1['zero']*100/$p1d1['partidos_jugados']);
+		                                    @$por_15_p1 = round($p1d1['one']*100/$p1d1['partidos_jugados']);
+		                                    @$por_25_p1 = round($p1d1['two']*100/$p1d1['partidos_jugados']);
+		                                    @$por_35_p1 = round($p1d1['tree']*100/$p1d1['partidos_jugados']);
+		                                    @$por_45_p1 = round($p1d1['four']*100/$p1d1['partidos_jugados']);
+		                                    @$por_55_p1 = round($p1d1['five']*100/$p1d1['partidos_jugados']);
+		                                    @$por_65_p1 = round($p1d1['six']*100/$p1d1['partidos_jugados']);
+
+		                                    @$por_05sp_p1 = round($p1d1['spzero']*100/$p1d1['partidos_jugados']);
+		                                    @$por_15sp_p1 = round($p1d1['spone']*100/$p1d1['partidos_jugados']);
+		                                    @$por_25sp_p1 = round($p1d1['sptwo']*100/$p1d1['partidos_jugados']);
+		                                    @$por_35sp_p1 = round($p1d1['sptree']*100/$p1d1['partidos_jugados']);
+		                                    @$por_45sp_p1 = round($p1d1['spfour']*100/$p1d1['partidos_jugados']);
+		                                    @$por_55sp_p1 = round($p1d1['spfive']*100/$p1d1['partidos_jugados']);
+		                                    @$por_65sp_p1 = round($p1d1['spsix']*100/$p1d1['partidos_jugados']);
+	                                    }
+	                                @endphp
+
+	                                <td>{{ $period }}</td>
+	                                <td>{{ @$player1 }}</td>
+	                                <td>
+                                        <!-- El enlace envía por AJAX la información para cargar el detalle -->
+                                        <a href="#" class="show-detail"
+                                           data-period="{{ $period }}"
+                                           data-player="p1"
+                                           data-player1="{{ $player1 }}"
+                                           data-player2="{{ $player2 }}"
+                                           data-ht1="{{ request('ht1') }}"
+                                           data-ht2="{{ request('ht2') }}"
+                                           data-url="{{ route('bets.detail') }}">
+                                           {{ $p1d1['partidos_jugados'] }}
+                                        </a>
+                                    </td>
+	                                <td>{{ round(@$por_05_p1) }}</td>
+	                                <td>{{ round(@$por_15_p1) }}</td>
+	                                <td>{{ round(@$por_25_p1) }}</td>
+	                                <td>{{ round(@$por_35_p1) }}</td>
+	                                <td>{{ round(@$por_45_p1) }}</td>
+	                                <td>{{ round(@$por_55_p1) }}</td>
+	                                <td>{{ round(@$por_65_p1) }}</td>
+	                                <td>{{ round(@$por_05sp_p1) }}</td>
+	                                <td>{{ round(@$por_15sp_p1) }}</td>
+	                                <td>{{ round(@$por_25sp_p1) }}</td>
+	                                <td>{{ round(@$por_35sp_p1) }}</td>
+	                                <td>{{ round(@$por_45sp_p1) }}</td>
+	                                <td>{{ round(@$por_55sp_p1) }}</td>
+	                                <td>{{ round(@$por_65sp_p1) }}</td>
+	                            </tr>
+	                        	@endforeach
+	                        @endforeach
+	                    @endif
+	                </tbody>
+	            </table> 
+    		</div>
+
+            <!-- Tabla 2: Data para player2 -->
+    		<div class="col-md-6">
+    			<table class="dttable table table-striped- table-bordered table-hover table-checkable">
+	                <thead>
+	                    <tr>
+	                        <th>Player</th>
+	                        <th>Partidos</th>
+	                        <th>0.5%</th>
+	                        <th>1.5%</th>
+	                        <th>2.5%</th>
+	                        <th>3.5%</th>
+	                        <th>4.5%</th>
+	                        <th>5.5%</th>
+	                        <th>6.5%</th>
+	                        <th>SP 0.5%</th>
+	                        <th>SP 1.5%</th>
+	                        <th>SP 2.5%</th>
+	                        <th>SP 3.5%</th>
+	                        <th>SP 4.5%</th>
+	                        <th>SP 5.5%</th>
+	                        <th>SP 6.5%</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                    @if(!empty(@$data_p2))
+	                        @foreach(@$data_p2 as $period => $dx)
+	                        	@foreach($dx as $p1d2)
+	                        	<tr>
+	                        		@php
+	                        			$p1d2 = (array)$p1d2;
+	                                    if($p1d2['partidos_jugados'] > 0){
+	                                        @$por_05_p2 = round($p1d2['zero']*100/$p1d2['partidos_jugados']);
+		                                    @$por_15_p2 = round($p1d2['one']*100/$p1d2['partidos_jugados']);
+		                                    @$por_25_p2 = round($p1d2['two']*100/$p1d2['partidos_jugados']);
+		                                    @$por_35_p2 = round($p1d2['tree']*100/$p1d2['partidos_jugados']);
+		                                    @$por_45_p2 = round($p1d2['four']*100/$p1d2['partidos_jugados']);
+		                                    @$por_55_p2 = round($p1d2['five']*100/$p1d2['partidos_jugados']);
+		                                    @$por_65_p2 = round($p1d2['six']*100/$p1d2['partidos_jugados']);
+
+		                                    @$por_05sp_p2 = round($p1d2['spzero']*100/$p1d2['partidos_jugados']);
+		                                    @$por_15sp_p2 = round($p1d2['spone']*100/$p1d2['partidos_jugados']);
+		                                    @$por_25sp_p2 = round($p1d2['sptwo']*100/$p1d2['partidos_jugados']);
+		                                    @$por_35sp_p2 = round($p1d2['sptree']*100/$p1d2['partidos_jugados']);
+		                                    @$por_45sp_p2 = round($p1d2['spfour']*100/$p1d2['partidos_jugados']);
+		                                    @$por_55sp_p2 = round($p1d2['spfive']*100/$p1d2['partidos_jugados']);
+		                                    @$por_65sp_p2 = round($p1d2['spsix']*100/$p1d2['partidos_jugados']);
+	                                    }
+	                                @endphp
+
+	                                <td>{{ @$player2 }}</td>
+	                                <td>
+                                        <a href="#" class="show-detail"
+                                           data-period="{{ $period }}"
+                                           data-player="p2"
+                                           data-player1="{{ $player1 }}"
+                                           data-player2="{{ $player2 }}"
+                                           data-ht1="{{ request('ht1') }}"
+                                           data-ht2="{{ request('ht2') }}"
+                                           data-url="{{ route('bets.detail') }}">
+                                           {{ $p1d2['partidos_jugados'] }}
+                                        </a>
+                                    </td>
+	                                <td>{{ round(@$por_05_p2) }}</td>
+	                                <td>{{ round(@$por_15_p2) }}</td>
+	                                <td>{{ round(@$por_25_p2) }}</td>
+	                                <td>{{ round(@$por_35_p2) }}</td>
+	                                <td>{{ round(@$por_45_p2) }}</td>
+	                                <td>{{ round(@$por_55_p2) }}</td>
+	                                <td>{{ round(@$por_65_p2) }}</td>
+	                                <td>{{ round(@$por_05sp_p2) }}</td>
+	                                <td>{{ round(@$por_15sp_p2) }}</td>
+	                                <td>{{ round(@$por_25sp_p2) }}</td>
+	                                <td>{{ round(@$por_35sp_p2) }}</td>
+	                                <td>{{ round(@$por_45sp_p2) }}</td>
+	                                <td>{{ round(@$por_55sp_p2) }}</td>
+	                                <td>{{ round(@$por_65sp_p2) }}</td>
+	                            </tr>
+	                        	@endforeach
+	                        @endforeach
+	                    @endif
+	                </tbody>
+	            </table> 
+    		</div>
+
+            <!-- Tabla 3: Comparación entre ambos jugadores -->
+    		<div class="col-md-12">
+    			<table class="dttable table table-striped- table-bordered table-hover table-checkable global_partidos">
+	                <thead>
+	                    <tr>
+	                    	<th>Dias</th>
+	                        <th>Playerzzz</th>
+	                        <th>Enemigo</th>
+	                        <th>Partidos</th>
+	                        <th><label class="filter" attr-val="0.5">0.5%</label></th>
+	                        <th><label class="filter" attr-val="1.5">1.5%</label></th>
+	                        <th><label class="filter" attr-val="2.5">2.5%</label></th>
+	                        <th><label class="filter" attr-val="3.5">3.5%</label></th>
+	                        <th><label class="filter" attr-val="4.5">4.5%</label></th>
+	                        <th><label class="filter" attr-val="5.5">5.5%</label></th>
+	                        <th><label class="filter" attr-val="6.5">6.5%</label></th>
+	                        <th>SP 0.5%</th>
+	                        <th>SP 1.5%</th>
+	                        <th>SP 2.5%</th>
+	                        <th>SP 3.5%</th>
+	                        <th>SP 4.5%</th>
+	                        <th>SP 5.5%</th>
+	                        <th>SP 6.5%</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                    @if(!empty($global_partidos))
+	                        @foreach($global_partidos as $bet2ene)
+                        		@php $bet2ene = (array)$bet2ene; @endphp
+                            	@if(!empty($bet2ene['partidos_jugados']) && $bet2ene['partidos_jugados'] > 0)
+	                        		@php
+	                                        @$por_05_global = round($bet2ene['zero']*100/$bet2ene['partidos_jugados']);
+	                                        @$por_15_global = round($bet2ene['one']*100/$bet2ene['partidos_jugados']);
+	                                        @$por_25_global = round($bet2ene['two']*100/$bet2ene['partidos_jugados']);
+	                                        @$por_35_global = round($bet2ene['tree']*100/$bet2ene['partidos_jugados']);
+	                                        @$por_45_global = round($bet2ene['four']*100/$bet2ene['partidos_jugados']);
+	                                        @$por_55_global = round($bet2ene['five']*100/$bet2ene['partidos_jugados']);
+	                                        @$por_65_global = round($bet2ene['six']*100/$bet2ene['partidos_jugados']);
+
+	                                        @$por_05sp_global = round($bet2ene['spzero']*100/$bet2ene['partidos_jugados']);
+	                                        @$por_15sp_global = round($bet2ene['spone']*100/$bet2ene['partidos_jugados']);
+	                                        @$por_25sp_global = round($bet2ene['sptwo']*100/$bet2ene['partidos_jugados']);
+	                                        @$por_35sp_global = round($bet2ene['sptree']*100/$bet2ene['partidos_jugados']);
+	                                        @$por_45sp_global = round($bet2ene['spfour']*100/$bet2ene['partidos_jugados']);
+	                                        @$por_55sp_global = round($bet2ene['spfive']*100/$bet2ene['partidos_jugados']);
+	                                        @$por_65sp_global = round($bet2ene['spsix']*100/$bet2ene['partidos_jugados']);
+	                                    @endphp
+		                        		<tr>
+		                                <td>{{ $bet2ene['umbral'] }}</td>
+		                                <td>{{ @$player1 }}</td>
+		                                <td>{{ @$player2 }}</td>
+		                                <td>
+                                            <a href="#" class="show-detail"
+                                               data-period="global"
+                                               data-player="global"
+                                               data-player1="{{ $player1 }}"
+                                               data-player2="{{ $player2 }}"
+                                               data-ht1="{{ request('ht1') }}"
+                                               data-ht2="{{ request('ht2') }}"
+                                               data-url="{{ route('bets.detail') }}">
+                                               {{ $bet2ene['partidos_jugados'] }}
+                                            </a>
+                                        </td>
+		                                <td>{{ round(@$por_05_global) }}</td>
+	                                    <td>{{ round(@$por_15_global) }}</td>
+	                                    <td>{{ round(@$por_25_global) }}</td>
+	                                    <td>{{ round(@$por_35_global) }}</td>
+	                                    <td>{{ round(@$por_45_global) }}</td>
+	                                    <td>{{ round(@$por_55_global) }}</td>
+	                                    <td>{{ round(@$por_65_global) }}</td>
+	                                    <td>{{ round(@$por_05sp_global) }}</td>
+	                                    <td>{{ round(@$por_15sp_global) }}</td>
+	                                    <td>{{ round(@$por_25sp_global) }}</td>
+	                                    <td>{{ round(@$por_35sp_global) }}</td>
+	                                    <td>{{ round(@$por_45sp_global) }}</td>
+	                                    <td>{{ round(@$por_55sp_global) }}</td>
+	                                    <td>{{ round(@$por_65sp_global) }}</td>
+		                            </tr>
+                            	@endif
+	                        @endforeach
+	                    @endif
+	                </tbody>
+            	</table> 
+    		</div>
+    		<div class="col-md-12">
+    			<table class="dttable table table-striped- table-bordered table-hover table-checkable">
+	                <thead>
+	                    <tr>
+	                    	<th>Dias</th>
+	                        <th>Playeryyy</th>
+	                        <th>Enemigo</th>
+	                        <th>Partidos</th>
+	                        <th>0.5%</th>
+	                        <th>1.5%</th>
+	                        <th>2.5%</th>
+	                        <th>3.5%</th>
+	                        <th>4.5%</th>
+	                        <th>5.5%</th>
+	                        <th>6.5%</th>
+	                        <th>SP 0.5%</th>
+	                        <th>SP 1.5%</th>
+	                        <th>SP 2.5%</th>
+	                        <th>SP 3.5%</th>
+	                        <th>SP 4.5%</th>
+	                        <th>SP 5.5%</th>
+	                        <th>SP 6.5%</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                    @if(!empty($global_partidos_sin_ht))
+	                        @foreach($global_partidos_sin_ht as $bet2ene_sin_ht)
+                        		@php $bet2ene_sin_ht = (array)$bet2ene_sin_ht; @endphp
+                            	@if(!empty($bet2ene_sin_ht['partidos_jugados']) && $bet2ene_sin_ht['partidos_jugados'] > 0)
+	                        		@php
+	                                        @$por_05_global = round($bet2ene_sin_ht['zero']*100/$bet2ene_sin_ht['partidos_jugados']);
+	                                        @$por_15_global = round($bet2ene_sin_ht['one']*100/$bet2ene_sin_ht['partidos_jugados']);
+	                                        @$por_25_global = round($bet2ene_sin_ht['two']*100/$bet2ene_sin_ht['partidos_jugados']);
+	                                        @$por_35_global = round($bet2ene_sin_ht['tree']*100/$bet2ene_sin_ht['partidos_jugados']);
+	                                        @$por_45_global = round($bet2ene_sin_ht['four']*100/$bet2ene_sin_ht['partidos_jugados']);
+	                                        @$por_55_global = round($bet2ene_sin_ht['five']*100/$bet2ene_sin_ht['partidos_jugados']);
+	                                        @$por_65_global = round($bet2ene_sin_ht['six']*100/$bet2ene_sin_ht['partidos_jugados']);
+
+	                                        @$por_05sp_global = round($bet2ene_sin_ht['spzero']*100/$bet2ene_sin_ht['partidos_jugados']);
+	                                        @$por_15sp_global = round($bet2ene_sin_ht['spone']*100/$bet2ene_sin_ht['partidos_jugados']);
+	                                        @$por_25sp_global = round($bet2ene_sin_ht['sptwo']*100/$bet2ene_sin_ht['partidos_jugados']);
+	                                        @$por_35sp_global = round($bet2ene_sin_ht['sptree']*100/$bet2ene_sin_ht['partidos_jugados']);
+	                                        @$por_45sp_global = round($bet2ene_sin_ht['spfour']*100/$bet2ene_sin_ht['partidos_jugados']);
+	                                        @$por_55sp_global = round($bet2ene_sin_ht['spfive']*100/$bet2ene_sin_ht['partidos_jugados']);
+	                                        @$por_65sp_global = round($bet2ene_sin_ht['spsix']*100/$bet2ene_sin_ht['partidos_jugados']);
+	                                    @endphp
+		                        		<tr>
+		                                <td>{{ $bet2ene_sin_ht['umbral'] }}</td>
+		                                <td>{{ @$player1 }}</td>
+		                                <td>{{ @$player2 }}</td>
+		                                <td>
+                                            <a href="#" class="show-detail"
+                                               data-period="global"
+                                               data-player="global"
+                                               data-player1="{{ $player1 }}"
+                                               data-player2="{{ $player2 }}"
+                                               data-ht1="{{ request('ht1') }}"
+                                               data-ht2="{{ request('ht2') }}"
+                                               data-url="{{ route('bets.detail') }}">
+                                               {{ $bet2ene_sin_ht['partidos_jugados'] }}
+                                            </a>
+                                        </td>
+		                                <td>{{ round(@$por_05_global) }}</td>
+	                                    <td>{{ round(@$por_15_global) }}</td>
+	                                    <td>{{ round(@$por_25_global) }}</td>
+	                                    <td>{{ round(@$por_35_global) }}</td>
+	                                    <td>{{ round(@$por_45_global) }}</td>
+	                                    <td>{{ round(@$por_55_global) }}</td>
+	                                    <td>{{ round(@$por_65_global) }}</td>
+	                                    <td>{{ round(@$por_05sp_global) }}</td>
+	                                    <td>{{ round(@$por_15sp_global) }}</td>
+	                                    <td>{{ round(@$por_25sp_global) }}</td>
+	                                    <td>{{ round(@$por_35sp_global) }}</td>
+	                                    <td>{{ round(@$por_45sp_global) }}</td>
+	                                    <td>{{ round(@$por_55sp_global) }}</td>
+	                                    <td>{{ round(@$por_65sp_global) }}</td>
+		                            </tr>
+                            	@endif
+	                        @endforeach
+	                    @endif
+	                </tbody>
+	            </table> 
+    		</div>
+    		<div class="col-md-6">
+    			<table class="dttable table table-striped- table-bordered table-hover table-checkable">
+	                <thead>
+	                    <tr>
+	                        <th>Player1</th>
+	                        <th>Player2</th>
+	                        <th>Team 1</th>
+	                        <th>Team 2</th>
+	                        <th>Fecha</th>
+	                        <th>Hora</th>
+	                        <th>HT1</th>
+	                        <th>HT2</th>
+	                        <th>HT</th>
+	                        <th>F1</th>
+	                        <th>F2</th>
+	                        <th>FT</th>
+	                        <th>SP</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                    @if(!empty($vs_p1) && @$vs_p1[0]->player1 != null)
+	                        @foreach($vs_p1 as $key => $p1)
+	                        	@php $p1 = (array)$p1; @endphp
+	                        	<tr>
+	                                <td>{{ @$p1['player1'] }}</td>
+	                                <td>{{ @$p1['player2'] }}</td>
+	                                <td>{{ @$p1['team1'] }}</td>
+	                                <td>{{ @$p1['team2'] }}</td>
+	                                <td>{{ @$p1['fecha'] }}</td>
+	                                <td>{{ @$p1['hora'] }}</td>
+	                                <td>{{ @$p1['ht1'] }}</td>
+	                                <td>{{ @$p1['ht2'] }}</td>
+	                                <td>{{ (@$p1['ht1'] + @$p1['ht2']) }}</td>
+	                                <td>{{ @$p1['ft1'] }}</td>
+	                                <td>{{ @$p1['ft2'] }}</td>
+	                                <td>{{ (@$p1['ft1'] + @$p1['ft2']) }}</td>
+	                                <td>{{ ((@$p1['ft1'] + @$p1['ft2']) - (@$p1['ht1'] + @$p1['ht2'])) }}</td>
+	                            </tr>
+	                        @endforeach
+	                    @endif
+	                </tbody>
+	            </table> 
+    		</div>
+    		<div class="col-md-6">
+    			<table class="dttable table table-striped- table-bordered table-hover table-checkable">
+	                <thead>
+	                    <tr>
+	                        <th>Player1</th>
+	                        <th>Player2</th>
+	                        <th>Team 1</th>
+	                        <th>Team 2</th>
+	                        <th>Fecha</th>
+	                        <th>Hora</th>
+	                        <th>HT1</th>
+	                        <th>HT2</th>
+	                        <th>HT</th>
+	                        <th>F1</th>
+	                        <th>F2</th>
+	                        <th>FT</th>
+	                        <th>SP</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                    @if(!empty($vs_p2) && @$vs_p2[0]->player2 != null)
+	                        @foreach($vs_p2 as $key => $p2)
+	                        	@php $p2 = (array)$p2; @endphp
+	                        	<tr>
+	                                <td>{{ @$p2['player1'] }}</td>
+	                                <td>{{ @$p2['player2'] }}</td>
+	                                <td>{{ @$p2['team1'] }}</td>
+	                                <td>{{ @$p2['team2'] }}</td>
+	                                <td>{{ @$p2['fecha'] }}</td>
+	                                <td>{{ @$p2['hora'] }}</td>
+	                                <td>{{ @$p2['ht1'] }}</td>
+	                                <td>{{ @$p2['ht2'] }}</td>
+	                                <td>{{ (@$p2['ht1'] + @$p2['ht2']) }}</td>
+	                                <td>{{ @$p2['ft1'] }}</td>
+	                                <td>{{ @$p2['ft2'] }}</td>
+	                                <td>{{ (@$p2['ft1'] + @$p2['ft2']) }}</td>
+	                                <td>{{ ((@$p2['ft1'] + @$p2['ft2']) - (@$p2['ht1'] + @$p2['ht2'])) }}</td>
+	                            </tr>
+	                        @endforeach
+	                    @endif
+	                </tbody>
+	            </table> 
+    		</div>
+    		
+    		
+    		
+    	</div>
+   	</div>
+</div>
+{{-- === Controles de Resumen (markets + botón) === --}}
+<div class="container my-3">
+  <div class="row align-items-end">
+    <div class="col-md-8">
+      <label for="summaryMarkets" class="mb-1">Mercados (FT Over x.5)</label>
+      <select id="summaryMarkets" class="form-control" multiple>
+        <option value="0.5">0.5</option>
+        <option value="1.5">1.5</option>
+        <option value="2.5" selected>2.5</option>
+        <option value="3.5" selected>3.5</option>
+        <option value="4.5" selected>4.5</option>
+        <option value="5.5">5.5</option>
+        <option value="6.5">6.5</option>
+      </select>
+      <small class="text-muted">Mantén CTRL / CMD para seleccionar varios.</small>
+    </div>
+    <div class="col-md-4">
+      <button id="btnSummary" class="btn btn-success btn-block mt-3">
+        Ver resumen (HT / Global)
+      </button>
+    </div>
+  </div>
+</div>
+
+{{-- === Modal de Resumen === --}}
+<div class="modal fade" id="summaryModal" tabindex="-1" role="dialog" aria-labelledby="summaryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document" style="        max-width: 1200px!important;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          Resumen de mercados — <span id="summaryTitlePlayers">{{ $player1 }} vs {{ $player2 }}</span>
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        {{-- Recomendación rápida --}}
+        <div class="card mb-3">
+          <div class="card-body">
+            <div id="summaryReco" class="d-flex flex-wrap align-items-center">
+              <div class="mr-3">
+                <strong>Recomendación:</strong>
+                <span id="recoText">—</span>
+              </div>
+              <div class="ml-auto">
+                <span id="recoBadge" class="badge badge-info">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {{-- Tabla por mercado y ventana --}}
+        <div class="table-responsive">
+          <table class="table table-sm table-bordered">
+            <thead class="thead-light">
+			  <tr>
+			    <th>Mercado</th>
+			    <th>Ventana</th>
+			    <th>Partidos (HT)</th>
+			    <th>Partidos (Global)</th>
+			    <th>% Over (HT)</th>
+			    <th>% Over (Global)</th>
+			    <th>% Under (HT)</th>
+			    <th>% Under (Global)</th>
+			    <th>Gap Over (abs)</th>
+			    <th>Validez</th>
+			  </tr>
+			</thead>
+
+            <tbody id="summaryTbody">
+              <tr><td colspan="9" class="text-center text-muted">Sin datos aún</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(document).ready(function(){
+    $('.show-detail').click(function(e){
+        e.preventDefault();
+        var period = $(this).data('period');
+        var playerType = $(this).data('player'); // 'p1', 'p2' o 'global'
+        player1 = $(this).data('player1');
+        player2 = $(this).data('player2');
+        ht1 = $(this).data('ht1');
+        ht2 = $(this).data('ht2');
+        var url = $(this).data('url');
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            data: {
+                period: period,
+                player: playerType,
+                player1: player1,
+                player2: player2,
+                ht1: ht1,
+                ht2: ht2
+            },
+            success: function(response) {
+                $('#modalDetailContent').html(response);
+                $('#detailModal').modal('show');
+            },
+            error: function() {
+                $('#modalDetailContent').html('<p>Error al cargar los detalles.</p>');
+                $('#detailModal').modal('show');
+            }
+        });
+    });
+
+    $(".filter").click(function(){
+    	data = {
+    		market : $(this).attr('attr-val'),
+			team1 : $("#team1 option:selected").text(),
+			team2 : $("#team2 option:selected").text(),
+	    	ht1 : $("#ht1").val(),
+			ht2 : $("#ht2").val(),
+			player1: @json($player1),
+			player2: @json($player2)
+    	}
+
+    	$.ajax({
+            url: "bets/shiny_data",
+            type: 'GET',
+            data: data,
+            success: function(response) {
+                // Nombres de los equipos
+		      $('#teamAName').text(response.teamA);
+		      $('#teamBName').text(response.teamB);
+
+		      // Últimos 5 partidos Team A
+		      const $last5A = $('#last5A').empty();
+		      response.last5A.forEach(m => {
+		        const htt    = m.ht1 + m.ht2;
+		        const ft_tot = m.ft_total; // viene de tu selectRaw (ft1+ft2)
+		        $last5A.append(`
+		          <tr>
+		            <td>${m.player1}</td>
+		            <td>${m.team1}</td>
+		            <td>${m.player2}</td>
+		            <td>${m.team2}</td>
+		            <td>${m.ht1}</td>
+		            <td>${m.ht2}</td>
+		            <td>${htt}</td>
+		            <td>${m.ft1}</td>
+		            <td>${m.ft2}</td>
+		            <td>${ft_tot}</td>
+		            <td>${m.sp}</td>
+		          </tr>
+		        `);
+		      });
+
+		      // Últimos 5 partidos Team B
+		      const $last5B = $('#last5B').empty();
+		      response.last5B.forEach(m => {
+		        const htt    = m.ht1 + m.ht2;
+		        const ft_tot = m.ft_total;
+		        $last5B.append(`
+		          <tr>
+		            <td>${m.player1}</td>
+		            <td>${m.team1}</td>
+		            <td>${m.player2}</td>
+		            <td>${m.team2}</td>
+		            <td>${htt}</td>
+		            <td>${m.ft1}</td>
+		            <td>${m.ft2}</td>
+		            <td>${ft_tot}</td>
+		            <td>${m.sp}</td>
+		          </tr>
+		        `);
+		      });
+
+      	const rows = [
+		  { label: "Hoy",       data: response.today_data },
+		  { label: "3D",        data: response.three_data },
+		  { label: "7D",        data: response.week_data },
+		  { label: "14D",       data: response.two_week_data },
+		  { label: "30D",       data: response.month_data },
+		  { label: "Global",    data: response.all_data }
+		];
+
+		// Generar el HTML del tbody
+		let tbodyHtml = '';
+		rows.forEach(row => {
+		  tbodyHtml += `<tr>
+		    <td>${row.label}</td>
+		    <td>${row.data.matches_filtered ?? '-'}</td>
+		    <td>${row.data.matches_global ?? '-'}</td>
+		    <td>${row.data.zero_filtered ?? '-'}</td>
+		    <td>${row.data.zero_global ?? '-'}</td>
+		    <td>${row.data.one_filtered ?? '-'}</td>
+		    <td>${row.data.one_global ?? '-'}</td>
+		    <td>${row.data.two_filtered ?? '-'}</td>
+		    <td>${row.data.two_global ?? '-'}</td>
+		    <td>${row.data.tree_filtered ?? '-'}</td>
+		    <td>${row.data.tree_global ?? '-'}</td>
+		    <td>${row.data.four_filtered ?? '-'}</td>
+		    <td>${row.data.four_global ?? '-'}</td>
+		    <td>${row.data.market_over_filtered ?? '-'}</td>
+		    <td>${row.data.market_over_global ?? '-'}</td>
+		    <td>${row.data.market_under_filtered ?? '-'}</td>
+		    <td>${row.data.market_under_global ?? '-'}</td>
+		  </tr>`;
+		});
+
+// Insertar en el tbody de la tabla
+$('table.table-sm.table-bordered tbody').html(tbodyHtml);
+
+		      // Mostrar modal
+		      $('#statsModal').modal('show');
+            },
+            error: function() {
+                $('#modalDetailContent').html('<p>Error al cargar los detalles.</p>');
+                $('#detailModal').modal('show');
+            }
+        });
+    	
+    })
+
+});
+</script>
+<script type="text/javascript">
+        $(document).ready(function() {
+        	$(".dttable").DataTable({
+        		scrollX: true,
+        		paginate: false,
+        		info: false
+        	})
+        })
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let player1 = @json($player1);
+    let player2 = @json($player2);
+    document.title = `${player1} vs ${player2} | Comparar`;
+});
+</script>
+<script>
+(function(){
+  // Helpers
+  function getSelectedMarkets(){
+    return Array.from(document.querySelectorAll('#summaryMarkets option:checked')).map(o => o.value);
+  }
+
+  function td(v){ return `<td>${(v ?? '-') }</td>`; }
+
+function classForGap(g){
+  if (g >= 15) return 'badge badge-success';
+  if (g >= 8)  return 'badge badge-warning';
+  return 'badge badge-secondary';
+}
+function sampleBadgeHT(n){
+  if (n == null) return '';
+  if (n < 8) return ' <span class="badge badge-danger">muestra baja</span>';
+  if (n < 12) return ' <span class="badge badge-warning">muestra media</span>';
+  return '';
+}
+function windowLabel(key){
+  return ({today:'Hoy', '3d':'3D', '7d':'7D', '14d':'14D', '30d':'30D', 'all':'Global'})[key] || key;
+}
+
+function renderSummary(response){
+  // Recomendación
+  const reco = response.recommendation || null;
+  if (reco && reco.market) {
+    const dirTxt = reco.direction ? (reco.direction.toUpperCase()) : '';
+    $('#recoText').text(`Mayor separación en ${reco.market} durante ${windowLabel(reco.window)} — GAP ${reco.gap} ${dirTxt ? `(${dirTxt})` : ''}`);
+    $('#recoBadge').text(`z=${(reco.details?.zscore ?? '-')}`);
+    $('#recoBadge').removeClass('badge-info badge-secondary').addClass('badge-info');
+  } else {
+    $('#recoText').text('Sin señal válida — muestras insuficientes o GAP bajo');
+    $('#recoBadge').text('—');
+    $('#recoBadge').removeClass('badge-info').addClass('badge-secondary');
+  }
+
+  // Tabla de filas
+  const markets = response.markets || [];
+  const results = response.results || {};
+  const order   = ['today','3d','7d','14d','30d','all'];
+
+  let rows = '';
+  markets.forEach(mkt => {
+    const mData = results[mkt] || {};
+    order.forEach(w => {
+      const d = mData[w] || {};
+      const valid = d.valid ? '✅' : '❌';
+      const why   = d.why_invalid || {};
+      const tips  = d.valid
+        ? ''
+        : `title="Req: ${why.abs?'✓abs':'✗abs'}, ${why.prop?'✓prop':'✗prop'}, ${why.gap?'✓gap':'✗gap'}, ${why.z?'✓z':'✗z'}"`;
+
+      rows += `<tr>
+        <td>${mkt}</td>
+        <td>${windowLabel(w)}</td>
+        <td>${(d.matches_filtered ?? '-')}${sampleBadgeHT(d.matches_filtered)}</td>
+        <td>${d.matches_global ?? '-'}</td>
+        <td>${d.over_filtered ?? '-'}</td>
+        <td>${d.over_global ?? '-'}</td>
+        <td>${d.under_filtered ?? '-'}</td>
+        <td>${d.under_global ?? '-'}</td>
+        <td><span class="${classForGap(d.gap_over_abs ?? 0)}">${d.gap_over_abs ?? '-'}</span></td>
+        <td ${tips}>${valid} ${d.direction ? `<span class="badge badge-light">${d.direction}</span>` : ''} ${d.zscore ? `<span class="badge badge-info">z=${d.zscore}</span>` : ''}</td>
+      </tr>`;
+    });
+  });
+
+  if(!rows){
+    rows = `<tr><td colspan="10" class="text-center text-muted">No hubo resultados</td></tr>`;
+  }
+
+  $('#summaryTbody').html(rows);
+}
+
+
+  // Click: botón resumen
+  $('#btnSummary').on('click', function(e){
+    e.preventDefault();
+
+    const params = {
+      player1: @json($player1),
+      player2: @json($player2),
+      ht1: $('#ht1').val(),
+      ht2: $('#ht2').val(),
+      markets: getSelectedMarkets()
+    };
+
+    $.ajax({
+      url: "{{ url('/bets/summary') }}",
+      type: 'GET',
+      data: params,
+      beforeSend: function(){
+        $('#summaryTbody').html(`<tr><td colspan="9" class="text-center">Cargando...</td></tr>`);
+        $('#recoText').text('Calculando…');
+        $('#recoBadge').text('—');
+        $('#summaryModal').modal('show');
+      },
+      success: function(resp){
+        renderSummary(resp || {});
+      },
+      error: function(xhr){
+        $('#summaryTbody').html(`<tr><td colspan="9" class="text-center text-danger">Error al consultar el resumen</td></tr>`);
+        $('#recoText').text('—');
+        $('#recoBadge').text('—');
+      }
+    });
+  });
+})();
+</script>
+
+
+@include('bets.stats_modal')
+@endsection

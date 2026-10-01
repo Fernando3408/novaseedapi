@@ -1,0 +1,820 @@
+@extends('layouts.app')
+@section('content')
+<style type="text/css">
+    .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+        color: #495057;
+        color: white!important;
+        background-color: #df6403;
+        border-color: #dee2e6 #dee2e6 #fff;
+    }
+
+    .last_updated{
+        background-color: #34bfa3!important;
+    }
+</style>
+
+<input type="hidden" id="id_block" value="{{$block->id}}">
+
+<div class="m-portlet m-portlet--head-solid-bg m-portlet--rounded">
+    <div class="m-portlet__head">
+        <div class="m-portlet__head-caption">
+            <div class="m-portlet__head-title">
+                <span class="m-portlet__head-icon">
+                    <i class="flaticon-list"></i>
+                </span>
+                <h3 class="m-portlet__head-text">
+                    Bloque / {{ $block->description }} / {{ $block->year }}
+                </h3>
+                
+            </div>          
+        </div>
+        <div class="m-portlet__head-tools">
+            <ul class="m-portlet__nav">
+                <li class="m-portlet__nav-item">
+                    <a href="{{ route('blocks.index') }}" class="m-portlet__nav-link btn btn-outline-primary m-btn m-btn--outline-2x ">
+                        <i class="fa fa-arrow-left"></i> Volver a bloques
+                    </a>
+                </li>
+                <li class="m-portlet__nav-item">
+                    <button type="button" id="agregar-codificados" class="m-portlet__nav-link btn btn-success m-btn m-btn--outline-2x ">
+                        <i class="fa fa-plus"></i> Agregar codificados
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="m-portlet__body">
+        <div class="blocks width{{ $block->lines }}" >
+            <?php $counter = 0; ?>
+            @foreach($blocks as $k => $block_)
+                <ul>
+                    @foreach($block_ as $i => $column)
+                        <li>
+                            <h5>{{ $k }}.{{ $i }} <input name="check_id[{{@$column[1]->position}}]" onclick="select_block(this)" value="{{@$column[1]->position}}" type="checkbox" /></h5>
+                            <div id="main_container_{{$k}}.{{$i}}" ondrop="drop(event)" ondragover="allowDrop(event)"  style="cursor: pointer;min-height: 80px">
+                                <div id="container_{{$k}}.{{$i}}" draggable="true" ondragstart="drag(event)" style="min-height: 30px;" attr-position="{{ $k }}.{{ $i }}">
+                                    @if(!empty($column))
+                                        @foreach($column as $c)
+                                            @if(!empty($c) and !empty($c->varity_id))
+                                                <?php $counter++; @$c->varity->code? $name = @$c->varity->code : $name = @$c->varity->name; ?>
+
+                                                    <a id="{{$counter}}" attr-obs="{{@$c->varity->observation}}" attr-pos="{{ $k }}.{{ $i }}" onclick='verCaracteristicas(<?php echo @$c->varity->id;?>,<?php echo @$c->id;?>,"<?php echo $c->type;?>",<?= $block->id;?>,<?= $counter;?>,"<?= @$name;?>",this,{{$c->review}})' >
+
+                                                    <?php 
+                                                        $color = ""; 
+                                                        if(@$last_block_modified != ""){
+                                                            $c->position == $last_block_modified->position ? $color = "red" : "";
+                                                        }
+                                                        
+                                                        $c->review == 1 ? $color = "#df6403" : "";                                                        
+                                                    ?>
+                                                        <h6 style="background-color: {{$color}}">
+                                                            <?php echo @$c->varity->name;?>
+                                                            <br>
+                                                            <b>(<?php echo $c->type;?>)</b>
+                                                        </h6>       
+                                                    </a>
+                                                @endif
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </div>
+                        </li>
+                    @endforeach
+                </ul>
+            @endforeach
+        </div>
+    </div>
+</div>
+
+<div class="modal fade show" id="modal-codificados" tabindex="-1" role="dialog" >
+    <div class="modal-dialog modal-lg" role="document" style="min-width: 1000px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Codificados</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="search-filters">
+                    <div class="row" style="margin-bottom: 20px;" id="search-varity">
+
+                        <div class="col-lg-3">
+                            <label for="">Mapeos</label>
+                            {!! Form::select('mapout_id', $mapouts,null,['class' => 'form-control required','placeholder' => 'Sin filtro']); !!}
+                        </div>
+                        <div class="col-lg-3">
+                            <label for="">Ensayos</label>
+                            {!! Form::select('block_id', $allBlocks,null,['class' => 'form-control required','placeholder' => 'Sin filtro']); !!}
+                        </div>
+
+                        <div class="col-lg-6">
+                            <button type="button" id="filtrar" class="btn btn-outline-success" style="margin-top: 23px;float: right;"> <i class="fa fa-search"></i> Filtrar</button>
+                            <button type="button" id="btn-agregar-caracteristica" class="btn btn-outline-danger" style="margin-top: 23px;float: right;margin-right: 10px;"> <i class="fa fa-plus"></i> Agregar Filtro</button>
+                        </div>
+                    </div>
+                </form>
+                <hr>
+
+                <div class="row" style="margin-bottom: 20px;">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label for="">Tipo de Ensayo</label>
+                            <!-- ,'12x2' => '12x2','12x3' => '12x3'-->
+                            {!! Form::select('type', array('6x1' => '6x1','12x1' => '12x1','12x2' => '12x2','12x3' => '12x3'),null, array('placeholder' => 'Seleccione ensayo','class' => 'form-control  required')) !!}
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <button type="button" id="agregar-bloque" class="btn btn-primary" style="margin-top: 23px;float: right;"><i class="fa fa-plus"></i> Agregar codificados</button>
+                    </div>
+                </div>
+                <hr>
+                <a class="btn btn-warning btn-sm" style="position: absolute;right: 360px;z-index: 11" href="#" id="checkedall">(Seleccionar todas)</a>
+                <a class="btn btn-warning btn-sm" style="position: absolute;right: 240px;z-index: 11" href="#" id="unchecked">(Quitar todos)</a>
+                <table class="table table-striped- table-bordered table-hover table-checkable datatables_p" id="table-coded">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Temporada</th>
+                            <th>Mercado</th>
+                            <th>Berries</th>
+                            <th>Madre</th>
+                            <th>Padre</th>
+                            <th>Mapeo</th>
+                            <th style="width:180px">Seleccionar</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade show" id="modal-repeticiones" tabindex="-1" role="dialog" >
+    <div class="modal-dialog modal-lg" role="document" style="min-width: 1000px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Repeticiones <strong id="name-repeats"></strong></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-body">
+                    <div class="row" style="margin-bottom: 20px;">
+                        <div class="col-lg-3">
+                            <label for="">Número de Repeticiones</label>
+                            <input type="text" id="n_repeats">
+                        </div>
+                        <div class="col-lg-3">
+                            <button type="button" id="agregar-bloque" class="btn btn-primary" style="margin-top: 10px;" onclick="addRepeat()"><i class="fa fa-plus"></i> Agregar repeticiones</button>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row" id="container_repeats">
+                        
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <button type="button" class="btn btn-success" style="float:right" onclick="processRepeats()"><i class="fa fa-save" ></i> Procesar</button>
+                            <button type="button" class="btn btn-danger" style="float:right;margin-right: 5px" onclick="closeRepears()"><i class="fa fa-close" ></i> Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade show" id="modal-fries" tabindex="-1" role="dialog" >
+    <div class="modal-dialog modal-lg" role="document" style="min-width: 1000px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Ingreso Datos Fritura</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-body">
+                    <div class="row" style="margin-bottom: 20px;">
+                        <table>
+                            <form id="form-fries">
+                                <tr>
+                                    <td>Enero</td>
+                                    <td>Febrero</td>
+                                    <td>Marzo</td>
+                                    <td>Abril</td>
+                                    <td>Mayo</td>
+                                    <td>Junio</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="text" id="Enero" onchange="change(this)" value="0"></td>
+                                    <td><input type="text" id="Febrero"  onchange="change(this)" value="0"></td>
+                                    <td><input type="text" id="Marzo" onchange="change(this)" value="0"></td>
+                                    <td><input type="text" id="Abril" onchange="change(this)" value="0"></td>
+                                    <td><input type="text" id="Mayo" onchange="change(this)" value="0"></td>
+                                    <td><input type="text" id="Junio" onchange="change(this)" value="0"></td>
+                                <tr style="margin-top: 30px;">
+                                    <td>Julio</td>
+                                    <td>Agosto</td>
+                                    <td>Septiembre</td>
+                                    <td>Octubre</td>
+                                    <td>Noviembre</td>
+                                    <td>Diciembre</td>
+                                </tr>
+                                </tr>
+                                <tr>
+                                    <td><input type="text" id="Julio" onchange="change(this)" value="0"></td>
+                                    <td><input type="text" id="Agosto" onchange="change(this)" value="0"></td>
+                                    <td><input type="text" id="Septiembre" onchange="change(this)" value="0"></td>
+                                    <td><input type="text" id="Octubre" onchange="change(this)" value="0"></td>
+                                    <td><input type="text" id="Noviembre" onchange="change(this)" value="0"></td>
+                                    <td><input type="text" id="Diciembre" onchange="change(this)" value="0"></td>
+                                </tr>
+                            </form>
+                        </table>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <button type="button" class="btn btn-success" style="float:right" onclick="procesaFries()"><i class="fa fa-save" ></i> Procesar</button>
+                            <button type="button" class="btn btn-danger" style="float:right;margin-right: 5px" onclick="closeFries()"><i class="fa fa-close" ></i> Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade show" id="modal-caracteristicas" tabindex="-1" role="dialog" >
+    <div class="modal-dialog modal-lg" role="document" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel" style="width: 30%">Características y fotos: <strong id="idblockname" ></strong></h5>
+
+                <select onchange="selectView(this)" class="form-control" style="width: 200px;" id="selectView">
+                    <option value="anho">Seleccione Visualización</option>
+                    <option value="anho">Todos</option>
+                    <option value="anho_0">Año 0</option>
+                    <option value="anho_1">Año 1</option>
+                    <option value="anho_2">Año 2</option>
+                    <option value="anho_3">Año 3</option>
+                    <option value="anho_4">Año 4</option>
+                </select>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <ul class="nav nav-tabs nav-fill" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active show" data-toggle="tab" href="#modal-carac">Características</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#modal-fot">Fotos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#modal-obs">Observación</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active show" id="modal-carac" role="tabpanel">
+
+                    </div>
+                    <div class="tab-pane" id="modal-fot" role="tabpanel">
+                        
+                    </div>
+                    <div class="tab-pane" id="modal-obs" role="tabpanel">
+                        <form id="FormObservation">
+                            <input type="hidden" name="blockvarity_id">
+                            <input type="hidden" name="id_varity_obs">
+                            <label for="">Observación</label>
+                            <textarea name="observation" class="form-control" cols="30" rows="10"></textarea>
+                            <button type="submit" class="btn btn-success"><i class="fa fa-save"></i> Guardar Observación</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        
+        var i = 0;
+        counter = 0;
+        paramsFries = []
+        ln  = 0;
+        global_process_fries = false;
+
+        $("#agregar-codificados").click(function(){
+            $("#modal-codificados").modal("show")
+        })
+
+        $("#btn-agregar-caracteristica").click(function(){
+            $.ajax({
+                url: '/blocks/addFeature',
+                type: 'get',
+                dataType: 'html',
+                data:{ i: i}
+            }).done(function(data) {
+                i = i + 1
+                $("#search-varity").append(data)
+            })
+        })
+
+        getDataFeature = function(val){
+            if(val.value != ""){
+                $.ajax({
+                    url: '/varities/addValues',
+                    type: 'get',
+                    dataType: 'html',
+                    data:{ feature: val.value}  
+                }).done(function(data) {
+                    $(val).parent().next().next('.col-lg-8').html(data)
+                })
+            }
+        }
+        
+        eliminarValor = function(element){
+            $(element).parent().next().remove()
+            $(element).parent().prev().remove()
+            $(element).parent().remove()
+            $(element).remove()
+        }
+
+        selectCode = function(element){
+            if ( $(element).is(':checked') ) {
+                $(element).val(ln)
+                ln++
+            }else{
+                ln--
+            }
+        }
+
+    table = $('#table-coded').DataTable( {
+        "order": [[ 1, "desc" ]],
+        "paging": true,
+        "searching": true,
+        processing: false,
+        ajax: {
+            url: '/crossings/codedJSON',
+            data: function ( d ) {
+                d.mapout_id = $("select[name=mapout_id]").val(),
+                d.market_id = $("select[name=market_id]").val(),
+                d.block_id  = $("select[name=block_id]").val(),
+                d.filters   = $("#search-filters").serialize()
+            }
+        },
+        columns: [
+            { 
+                "data": "name"
+                /*
+                "render": function ( data, type, row ) {
+                    if(row.name != null){
+                        if(typeof row.market.name !== 'undefined'){
+                            return row.market.name;
+                        }else{
+                            return ""
+                        }
+
+                    }
+                    return "-";
+                } 
+                */
+            },
+            { 
+                "data": "year",
+                "render": function ( data, type, row ) {
+                    return "T"+(row.year - 1)+"-"+row.year
+                } 
+            },
+            { 
+                "data": "market.name",
+                "render": function ( data, type, row ) {
+                    if(row.market_id != null){
+                        /*
+                        if(typeof row.market.name !== 'undefined'){
+                            return row.market.name;
+                        }else{
+                            return ""
+                        }
+                        */
+
+                        return "-"
+                    }
+                    return "-";
+                } 
+            },
+            { 
+                "data": "berries"
+            },
+            { 
+                "data": "mother.name",
+                "render": function ( data, type, row ) {
+                    /*
+                    if(row.mother.crossing != 1){
+                      return row.mother.name;
+                    }else{
+                      return row.mother.code;
+                    }
+                    */
+                    return "-"
+                } 
+            },
+            { 
+                "data": "father.name",
+                "render": function ( data, type, row ) {
+                    /*
+                    if(row.father.crossing != 1){
+
+                      return row.father.name;
+                    }else{
+                      return row.father.code;
+                    }
+                    */
+
+                    return "-";
+                } 
+            },
+            { 
+                "data": "mapout.year",
+                "render": function ( data, type, row ) {
+                    /*
+                    if(row.mapout_id != null){
+                        return row.mapout.year;
+                    }
+                    */
+                    return "-";
+                } 
+            },
+            { 
+                "data": "code",
+                "render": function ( data, type, row ) {
+                    if(row.code == null){
+                        row.code = "";
+                    }
+                    return '<center><input name="codificados['+row.id+']" onclick="selectCode(this)" value="'+row.id+'" type="checkbox" class="codificados" /></center>';
+                } 
+            }
+        ],"drawCallback": function (settings) { 
+            // Here the response
+            $("#filtrar").html('<i class="fa fa-search"></i> Filtrar')
+            var response = settings.json;
+        },
+     } );
+
+        $("#filtrar").click(function(){
+            $("#filtrar").html('<i class="fa fa-spinner fa-spin"></i> Cargando')
+            table.ajax.reload()
+        })
+
+        $("#agregar-bloque").click(function(){
+            
+            if($("select[name=type]").val() == ""){
+                Swal.fire(
+                    'Tipo de ensayo',
+                    'Debe seleccionar tipo de ensayo',
+                    'error'
+                )
+                return false
+            }
+
+            $("#agregar-bloque").html('<i class="fa fa-spinner fa-spin"></i> Cargando')
+
+            location.href = "/blocks/codify?block_id=<?= $block->id;?>&"+table.$('input.codificados').serialize()+"&type="+$("select[name=type]").val()
+        })
+
+        $("#checkedall").click(function(){
+            table.$('input.codificados').attr("checked",true)
+        })
+
+        $("#unchecked").click(function(){
+            table.$('input.codificados').attr("checked",false)
+        })
+
+        verCaracteristicas = function(id,element_id,type,block_id,idactual,blockname,ele,review){
+            global_idactua = idactual
+            global_type = type;
+            $("#idblockname").empty().html(blockname)
+            $("#FormObservation input[name=blockvarity_id]").val(block_id)
+            $("#FormObservation input[name=id_varity_obs]").val(id)
+            $("#modal-caracteristicas").modal("show")
+            $("#modal-caracteristicas .modal-body #modal-carac").html('<center><h4><i class="fas fa-spinner fa-spin"></i> Cargando características.</h4></center>')
+            $.ajax({
+                url: '/blocks/getCaracteristicas',
+                type: 'GET',
+                dataType: 'html',
+                data: {crossing: id,element_id:element_id, type: type,block_id:block_id,block_name:blockname},
+            }).done(function(data) {
+                $("#modal-caracteristicas #modal-carac").html(data)
+
+            })
+
+            $.ajax({
+                url: '/blocks/getFotos',
+                type: 'GET',
+                dataType: 'html',
+                data: {crossing: id},
+            }).done(function(data) {
+                global_process_fries = false;
+                $("#modal-caracteristicas #modal-fot").html(data)
+
+            })
+
+            observation = $(ele).attr("attr-obs");
+            position_selected = $(ele).attr("attr-pos")
+            review_selected = review
+            
+            $("#FormObservation textarea[name=observation]").val(observation)
+            
+        }
+
+        $("#FormObservation").submit(function(){
+            $.ajax({
+                url: '/blocks/saveObservation',
+                type: 'GET',
+                dataType: 'json',
+                data: $("#FormObservation").serialize()
+            }).done(function(data) {
+                if(data){
+                    Swal({
+                      title: 'Observación guardada correctamente.',
+                      text: "",
+                      type: 'success',
+                      showCancelButton: false,
+                      showConfirmButton: false,
+                    })
+                }else{
+                    Swal({
+                      title: 'Error,no se pudo guardar la Observación.',
+                      text: "",
+                      type: 'error',
+                      showCancelButton: false,
+                      showConfirmButton: false,
+                    })
+                }
+            })
+            
+            return false;
+        })
+    })
+
+    insertRepeat = function(ele, feature_id, varity_id,year,vname){
+
+
+        name = $(ele).attr('attr-name')
+        set_n_repeats = "";
+
+        $("#name-repeats").empty().html(vname)
+
+        global_year = year;
+        global_varity = varity_id;
+        global_feature= feature_id;
+
+        //attr-type 1: Repeticiones - 2 Frituras
+        if($(ele).attr('attr-fries') == 1){
+            $("#modal-caracteristicas").modal('hide')
+            $("#form-fries").trigger("reset");
+
+            var params = {
+                varity_id :  varity_id,
+                year : year,
+                feature_id: feature_id
+            }
+            getDetailFries(params);
+
+            setTimeout(function(){ $("#modal-fries").modal('show'); }, 500);
+        }
+
+        // Ej: 6x1 -> set_n_repeats = 1;
+        if(global_type != ""){
+            set_n_repeats = global_type.split('x')[1]
+            if(set_n_repeats == 1){
+                return false;
+            }
+        }   
+
+        if($(ele).attr('attr-type') == 1) {
+            $("#modal-caracteristicas").modal('hide')
+            if($("input[name='"+name+"[value_repeats]']").val() == ""){
+                arr = ""
+                $("#container_repeats").empty()
+                $("#n_repeats").val(set_n_repeats)
+                addRepeat()
+            }else{ 
+                arr = $("input[name='"+name+"[value_repeats]']").val().split(",")
+                addRepeat(arr.length)
+                $("#n_repeats").val(arr.length)
+            }
+            setTimeout(function(){ $("#modal-repeticiones").modal('show'); }, 500);
+        }
+    }
+
+    getDetailFries = function(info){
+        $.ajax({
+            url: '/fries/getData/',
+            type: 'GET',
+            data: {year: info.year, varity: info.varity_id, feature : info.feature_id},
+            dataType: 'json',
+        }).done(function(data) {
+            if(data.status){
+                var r = data.data
+                $("#Enero").val(r.enero).change()
+                $("#Febrero").val(r.febrero).change()
+                $("#Marzo").val(r.marzo).change()
+                $("#Mayo").val(r.mayo).change()
+                $("#Abril").val(r.abril).change()
+                $("#Junio").val(r.junio).change()
+                $("#Julio").val(r.julio).change()
+                $("#Agosto").val(r.agosto).change()
+                $("#Septiembre").val(r.septiembre).change()
+                $("#Octubre").val(r.octubre).change()
+                $("#Noviembre").val(r.noviembre).change()
+                $("#Diciembre").val(r.diciembre).change()
+            }
+        })
+    }
+
+    addRepeat = function(x = null){
+        if(x == null){
+            x = $("#n_repeats").val()
+        }
+
+        $("#container_repeats").empty()
+
+        for (var i = 1; i <= x; i++) {
+            $("#container_repeats").append("<div class='col-lg-3' style='margin-top:5px;'><label>Repeteción Nº"+i+"</label><input type='text' id='nr_"+i+"'></div>")
+            //El primero siempre en 0
+            if(!arr[i-1]){
+                $("#nr_"+i).val(0)
+            }else{
+                $("#nr_"+i).val(arr[i-1])
+
+            }
+        }
+    }
+
+    processRepeats = function(){
+        const x = $("#n_repeats").val()
+        var valueToShow = 0;
+        var valueToSave = "";
+
+        for (var i = 1; i <= x; i++) {
+            valueToShow += parseFloat($("#nr_"+i).val())
+            valueToSave += $("#nr_"+i).val()+","
+        }   
+
+        valueToShow = (valueToShow / parseInt(x)).toFixed(1)
+        valueToSave = valueToSave.slice(0, -1);
+
+        $("input[name='"+name+"[value_repeats]']").val(valueToSave)
+        $("input[name='"+name+"[value]']").val(valueToShow)
+        $("#modal-repeticiones").modal('hide')
+        setTimeout(function(){ $("#modal-caracteristicas").modal('show'); }, 500);
+    }
+
+    closeRepears = function(){
+        $("#modal-repeticiones").modal('hide')
+        setTimeout(function(){ $("#modal-caracteristicas").modal('show'); }, 500);
+    }
+
+    closeFries = function(){
+        $("#modal-fries").modal('hide')
+        setTimeout(function(){ $("#modal-caracteristicas").modal('show'); }, 500);
+    }
+
+    function allowDrop(ev) {
+        ev.preventDefault();
+
+    }
+
+    function drag(ev) {
+
+        a = ev.dataTransfer.setData("text", ev.target.id);
+
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        var src = document.getElementById(ev.dataTransfer.getData("text"));
+        var srcParent = src.parentNode;
+        var tgt = ev.currentTarget.firstElementChild;
+        ev.currentTarget.replaceChild(src, tgt);
+        srcParent.appendChild(tgt);
+
+        position_drag = $(src).attr("attr-position")
+        position_drop = $(tgt).attr("attr-position")
+
+        $.ajax({
+            url: "/blocks/move_position",
+            type: 'GET',
+            data: {position_drag: position_drag, position_drop: position_drop,block: $("#id_block").val()},
+            dataType: 'json',
+        }).done(function(dataxx) {
+            $("#container_"+position_drag).data('attr-position', position_drop)
+            $("#container_"+position_drop).data('attr-position', position_drag)
+        })
+    
+    }
+
+
+    change = function(ele){
+
+        $(ele).val() > 0 ? counter++ : "" ;
+        $(ele).val() == "" ? counter-- : "" ;
+
+    }
+
+
+    procesaFries =  function(){
+
+        global_process_fries = true;
+
+        v1 = 0;
+        v1 += parseInt($("#Enero").val());
+        v1 += parseInt($("#Febrero").val());
+        v1 += parseInt($("#Marzo").val());
+        v1 += parseInt($("#Mayo").val());
+        v1 += parseInt($("#Junio").val());
+        v1 += parseInt($("#Julio").val());
+        v1 += parseInt($("#Agosto").val());
+        v1 += parseInt($("#Septiembre").val());
+        v1 += parseInt($("#Octubre").val());
+        v1 += parseInt($("#Noviembre").val());
+        v1 += parseInt($("#Diciembre").val());
+        v1 += parseInt($("#Abril").val());
+
+        promedio = v1/counter;
+
+        paramsFriesArray = {
+            "_token": "{{ csrf_token() }}",
+            Enero : $("#Enero").val(),
+            Febrero : $("#Febrero").val(),
+            Marzo : $("#Marzo").val(),
+            Mayo : $("#Mayo").val(),
+            Junio : $("#Junio").val(),
+            Julio : $("#Julio").val(),
+            Agosto : $("#Agosto").val(),
+            Septiembre : $("#Septiembre").val(),
+            Octubre : $("#Octubre").val(),
+            Noviembre : $("#Noviembre").val(),
+            Diciembre : $("#Diciembre").val(),
+            Abril : $("#Abril").val(),
+            promedio: promedio,
+            year: global_year,
+            feature: global_feature,
+            varity: global_varity,
+            id: null
+        }
+
+        if (paramsFries.length > 0) {
+            $.each(paramsFries, function(i,v){
+                if(v.feature == global_feature && v.varity == global_varity){
+                    paramsFries.splice(i, 1);
+                }
+            })
+
+        }
+
+        paramsFries.push(paramsFriesArray);
+
+        $("input[name='"+name+"[value]']").val(promedio)
+        $("#modal-fries").modal('hide')
+        setTimeout(function(){ $("#modal-caracteristicas").modal('show'); }, 500);    
+        
+        
+    }
+
+    selectView = function(e){
+        var selected = $(e).val();
+        $(".anho").hide()
+        console.log(selected)
+        $("."+selected).show()
+    }
+
+    selected_position = [];
+
+    select_block =  function(element){
+        var id = $(element).val()
+        var item = {};
+        
+        for (var i = 0; i < selected_position.length; i++) {
+            if ( (selected_position[i]['POSITION'] == id)) {
+                selected_position.splice(id, 1);
+            };
+        };
+
+        if ( $(element).is(':checked') ) {
+            item['POSITION'] = id;
+            selected_position.push(item);
+        }
+    }
+
+</script>
+@endsection

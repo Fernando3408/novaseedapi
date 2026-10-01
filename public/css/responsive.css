@@ -1,0 +1,66 @@
+@media (max-width: 1024px){
+	.m-aside-header-menu-mobile.m-aside-header-menu-mobile--skin-light {
+	    background-color: #222327;
+	}
+
+	.m-aside-header-menu-mobile.m-aside-header-menu-mobile--skin-light .m-menu__nav>.m-menu__item.m-menu__item--active>.m-menu__heading, .m-aside-header-menu-mobile.m-aside-header-menu-mobile--skin-light .m-menu__nav>.m-menu__item.m-menu__item--active>.m-menu__link {
+	    background-color: #ba3e39;
+	}
+	.m-aside-header-menu-mobile-close.m-aside-header-menu-mobile-close--skin-light {
+	    background-color: #ae4843;
+	    color: #FFF;
+	}
+
+	.m-aside-header-menu-mobile-close.m-aside-header-menu-mobile-close--skin-light i {
+	    color: #FFF;
+	}
+
+	#form-reporte{
+		position: absolute;
+		top: 6px;
+		left: 6px;
+	}
+
+	/*.m-header__bottom {
+	    margin-top: 0px;
+	}*/
+	
+	#home-mobile h6 {
+	    font-size: 10px;
+	}
+
+	#home-mobile td {
+	    font-size: 10px;
+	}
+
+	#home-mobile .m-accordion__item-content{
+		padding:5px;
+	}
+
+	#home-mobile .m-accordion .m-accordion__item .m-accordion__item-head {
+	    padding: 5px;
+	}
+
+	#home-mobile i{
+		font-size: 15px !important;
+	}
+
+	#FormGenerateReport .m-checkbox{
+		width: 100% !important;
+	}
+
+	#FormGenerateReport .m-radio>span, #FormGenerateReport .m-checkbox>span {
+	    top: -1px;
+	}
+
+	/*.highcharts-container{
+		width: 400px;
+	}
+	.highcharts-container svg{
+		width: 400px !important;
+	}*/
+
+	#volver-mobile{
+	    display: block;
+	}
+}

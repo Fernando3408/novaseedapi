@@ -1,0 +1,111 @@
+<form action="/crossings/saveCharacteristics" method="POST">
+    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="varity_id" value="{{ $crossing->id }}">
+    <h5>Características</h5>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#" data-target="#year_0">Año 0</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#year_1">Año 1</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#year_2">Año 2</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#year_3">Año 3</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#year_4">Año 4</a>
+        </li>
+    </ul>                    
+   <div class="tab-content">
+        <?php $i = 0;?>
+        <div class="tab-pane active" id="year_0" role="tabpanel">
+            <div class="row">
+                @foreach($features as $f)
+                    <div class="col-lg-3">
+                        <h6 style="margin-top: 15px">{{ $f->name }}</h6>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            {!! Form::text('values['.$i.'][value]', $f->valor0, array('placeholder' => 'Ingrese valor','class' => 'form-control   required')) !!}
+                            {!! Form::hidden('values['.$i.'][year]', 0 ) !!}
+                            {!! Form::hidden('values['.$i.'][id]', $f->id ) !!}
+                        </div>
+                    </div>
+                    <?php $i++;?>
+                @endforeach
+            </div>
+        </div>
+        <div class="tab-pane" id="year_1" role="tabpanel">
+            <div class="row">
+                @foreach($features as $f)
+                    <div class="col-lg-3">
+                        <h6 style="margin-top: 15px">{{ $f->name }}</h6>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            {!! Form::text('values['.$i.'][value]', $f->valor1, array('placeholder' => 'Ingrese valor','class' => 'form-control   required')) !!}
+                            {!! Form::hidden('values['.$i.'][year]', 1 ) !!}
+                            {!! Form::hidden('values['.$i.'][id]', $f->id ) !!}
+                        </div>
+                    </div>
+                    <?php $i++;?>
+                @endforeach
+            </div>
+        </div>
+        <div class="tab-pane" id="year_2" role="tabpanel">
+            <div class="row">
+                @foreach($features as $f)
+                    <div class="col-lg-3">
+                        <h6 style="margin-top: 15px">{{ $f->name }}</h6>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            {!! Form::text('values['.$i.'][value]', $f->valor2, array('placeholder' => 'Ingrese valor','class' => 'form-control   required')) !!}
+                            {!! Form::hidden('values['.$i.'][year]', 2 ) !!}
+                            {!! Form::hidden('values['.$i.'][id]', $f->id ) !!}
+                        </div>
+                    </div>
+                    <?php $i++;?>
+                @endforeach
+            </div>
+        </div>
+        <div class="tab-pane" id="year_3" role="tabpanel">
+            <div class="row">
+                @foreach($features as $f)
+                    <div class="col-lg-3">
+                        <h6 style="margin-top: 15px">{{ $f->name }}</h6>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            {!! Form::text('values['.$i.'][value]', $f->valor3, array('placeholder' => 'Ingrese valor','class' => 'form-control   required')) !!}
+                            {!! Form::hidden('values['.$i.'][year]', 3 ) !!}
+                            {!! Form::hidden('values['.$i.'][id]', $f->id ) !!}
+                        </div>
+                    </div>
+                    <?php $i++;?>
+                @endforeach
+            </div>
+        </div>
+        <div class="tab-pane" id="year_4" role="tabpanel">
+            <div class="row">
+                @foreach($features as $f)
+                    <div class="col-lg-3">
+                        <h6 style="margin-top: 15px">{{ $f->name }}</h6>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            {!! Form::text('values['.$i.'][value]', $f->valor4, array('placeholder' => 'Ingrese valor','class' => 'form-control   required')) !!}
+                            {!! Form::hidden('values['.$i.'][year]', 4 ) !!}
+                            {!! Form::hidden('values['.$i.'][id]', $f->id ) !!}
+                        </div>
+                    </div>
+                    <?php $i++;?>
+                @endforeach
+            </div>
+        </div>
+    </div> 
+    <button type="submit" class="btn btn-success">Modificar Características</button>
+</form>

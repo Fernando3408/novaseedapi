@@ -1,0 +1,503 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Characteristic;
+use App\Models\Feature;
+use App\Models\Varity;
+use App\Stdmarket;
+use App\Relativeyield;
+use App\GreenHouse;
+use App\Traceability;
+
+/**
+ * Contrato común para exponer datos del ERP a NovaSeed IA.
+ *
+ * Esta primera versión es deliberadamente sólo lectura y no ejecuta consultas
+ * por sí misma. Normaliza la envoltura de respuesta para que los agentes
+ * reciban fuente, filtros, conteos y advertencias de forma consistente.
+ */
+class NovaSeedIaGateway
+{
+    const CONTRACT_VERSION = '1.0.0';
+
+    /**
+     * Devuelve las capacidades de lectura que el gateway puede publicar.
+     *
+     * @return array
+     */
+    public function capabilities(): array
+    {
+        return [
+            'contract_version' => self::CONTRACT_VERSION,
+            'mode' => 'read_only',
+            'source' => 'novaseed-erp',
+            'tools' => [
+                'catalog_features',
+                'build_result_query',
+                'search_results',
+                'get_variety_profile',
+                'get_lineage',
+                'compare_varieties',
+                'get_market_standards',
+                'get_relative_yields',
+                'get_greenhouse_status',
+                'get_traceability',
+                'get_data_quality_summary',
+            ],
+            'native_endpoints' => [
+                'catalog_features' => '/api/features/catalog',
+                'query_guide' => '/api/results/query-guide',
+                'search_results' => '/api/results/search',
+                'variety_profile' => '/api/ia/variety/{identifier}',
+                'lineage' => '/api/ia/lineage/{identifier}',
+                'compare_varieties' => '/api/ia/compare',
+                'market_standards' => '/api/ia/market-standards',
+                'relative_yields' => '/api/ia/relative-yields',
+                'greenhouse_status' => '/api/ia/greenhouse-status',
+                'data_quality_summary' => '/api/ia/data-quality',
+            ],
+            'write_operations' => [],
+        ];
+    }
+
+    /**
+     * Construye una respuesta normalizada para el servicio de IA.
+     *
+     * @param string $tool
+     * @param array $filters
+     * @param array $results
+     * @param array $parents
+     * @param array $warnings
+     * @param array $dataQuality
+     * @return array
+     */
+    public function envelope(
+        string $tool,
+        array $filters = [],
+        array $results = [],
+        array $parents = [],
+        array $warnings = [],
+        array $dataQuality = []
+    ): array {
+        return [
+            'query_id' => $this->queryId(),
+            'contract_version' => self::CONTRACT_VERSION,
+            'source' => 'novaseed-erp',
+            'tool' => $tool,
+            'retrieved_at' => gmdate('c'),
+            'filters_applied' => $filters,
+            'results' => array_values($results),
+            'parents' => array_values($parents),
+            'counts' => [
+                'results' => count($results),
+                'parents' => count($parents),
+            ],
+            'warnings' => array_values($warnings),
+            'data_quality' => array_merge([
+                'measured' => true,
+                'calculated' => false,
+                'inferred' => false,
+                'external' => false,
+                'missing_fields' => [],
+                'missing_count' => 0,
+                'duplicate_results' => [],
+                'parents_without_measured_profile' => [],
+            ], $dataQuality),
+        ];
+    }
+
+    /**
+     * Envuelve documentos de configuración del ERP, como catálogo y guía.
+     *
+     * @param string $tool
+     * @param mixed $data
+     * @return array
+     */
+    public function document(string $tool, $data): array
+    {
+        return [
+            'query_id' => $this->queryId(),
+            'contract_version' => self::CONTRACT_VERSION,
+            'source' => 'novaseed-erp',
+            'tool' => $tool,
+            'retrieved_at' => gmdate('c'),
+            'data' => $data,
+            'warnings' => [],
+            'data_quality' => [
+                'measured' => true,
+                'calculated' => false,
+                'inferred' => false,
+                'external' => false,
+                'missing_fields' => [],
+                'missing_count' => 0,
+                'duplicate_results' => [],
+                'parents_without_measured_profile' => [],
+            ],
+        ];
+    }
+
+    /**
+     * Clasifica la evidencia usada por una respuesta de IA.
+     *
+     * @param array $data
+     * @return array
+     */
+    public function evidence(array $data = []): array
+    {
+        return array_merge([
+            'observed' => [],
+            'calculated' => [],
+            'inferred' => [],
+            'external' => [],
+            'missing' => [],
+        ], $data);
+    }
+
+    /**
+     * Perfil de una variedad con mediciones agregadas por característica.
+     * Sólo lectura: no crea ni actualiza registros del ERP.
+     */
+    public function varietyProfile(string $identifier, ?int $localityId = null): array
+    {
+        $variety = $this->findVariety($identifier);
+        if (!$variety) {
+            return [
+                'found' => false,
+                'identifier' => $identifier,
+                'warnings' => ['No se encontró una variedad con el identificador recibido.'],
+            ];
+        }
+
+        $query = Characteristic::where('varity_id', $variety->id)
+            ->where('value', '!=', '');
+        if ($localityId !== null) {
+            $query->where('locality_id', $localityId);
+        }
+        $characteristics = $query->get();
+        $featureNames = Feature::whereIn('id', $characteristics->pluck('feature_id')->unique()->values())
+            ->pluck('name', 'id');
+        $features = [];
+        foreach ($characteristics->groupBy('feature_id') as $featureId => $rows) {
+            $values = $rows->pluck('value')->filter(function ($value) {
+                return $value !== null && $value !== '';
+            })->values();
+            $numeric = $values->filter(function ($value) {
+                return is_numeric($value);
+            });
+            $features[] = [
+                'feature_id' => (int) $featureId,
+                'feature_name' => (string) ($featureNames[$featureId] ?? ('feature_'.$featureId)),
+                'value' => $numeric->count() === $values->count() && $numeric->count() > 0
+                    ? round((float) $numeric->avg(), 4)
+                    : (string) ($values->first() ?? ''),
+                'observations' => $values->count(),
+                'locality_id' => $localityId,
+            ];
+        }
+
+        return [
+            'found' => true,
+            'variety' => $this->varietyIdentity($variety),
+            'features' => $features,
+            'counts' => ['features' => count($features), 'observations' => $characteristics->count()],
+            'warnings' => $localityId === null ? ['Perfil agregado sin restringir localidad.'] : [],
+        ];
+    }
+
+    /** Devuelve genealogía acotada y evita ciclos o profundidad ilimitada. */
+    public function lineage(string $identifier, int $depth = 3): array
+    {
+        $variety = $this->findVariety($identifier);
+        if (!$variety) {
+            return ['found' => false, 'warnings' => ['Variedad no encontrada.']];
+        }
+        $depth = max(0, min($depth, 6));
+        return [
+            'found' => true,
+            'root' => $this->varietyIdentity($variety),
+            'nodes' => $this->lineageNodes($variety, $depth, []),
+            'depth' => $depth,
+            'warnings' => [],
+        ];
+    }
+
+    /** Compara perfiles medidos sin convertir diferencias en predicciones. */
+    public function compareVarieties(array $identifiers, ?int $localityId = null): array
+    {
+        $identifiers = array_values(array_unique(array_slice($identifiers, 0, 10)));
+        $profiles = [];
+        $warnings = [];
+        foreach ($identifiers as $identifier) {
+            $profile = $this->varietyProfile((string) $identifier, $localityId);
+            if ($profile['found']) {
+                $profiles[] = $profile;
+            } else {
+                $warnings[] = 'No se encontró: '.(string) $identifier;
+            }
+        }
+        $featureMap = [];
+        foreach ($profiles as $profile) {
+            foreach ($profile['features'] as $feature) {
+                $featureMap[$feature['feature_id']]['feature_name'] = $feature['feature_name'];
+                $featureMap[$feature['feature_id']]['values'][] = [
+                    'variety' => $profile['variety']['label'],
+                    'value' => $feature['value'],
+                    'observations' => $feature['observations'],
+                ];
+            }
+        }
+        $distances = [];
+        for ($i = 0; $i < count($profiles); $i++) {
+            for ($j = $i + 1; $j < count($profiles); $j++) {
+                $left = collect($profiles[$i]['features'])->keyBy('feature_id');
+                $right = collect($profiles[$j]['features'])->keyBy('feature_id');
+                $shared = [];
+                foreach ($left as $featureId => $feature) {
+                    if (!isset($right[$featureId]) || !is_numeric($feature['value']) || !is_numeric($right[$featureId]['value'])) {
+                        continue;
+                    }
+                    $shared[] = abs((float) $feature['value'] - (float) $right[$featureId]['value']);
+                }
+                $distances[] = [
+                    'left' => $profiles[$i]['variety']['label'],
+                    'right' => $profiles[$j]['variety']['label'],
+                    'distance' => count($shared) ? round(array_sum($shared) / count($shared), 4) : null,
+                    'shared_numeric_features' => count($shared),
+                    'method' => 'media de diferencia absoluta en rasgos numéricos compartidos; ponderación uniforme',
+                    'interpretation' => 'distancia descriptiva de perfiles, no parentesco ni predicción de progenie',
+                ];
+            }
+        }
+        return [
+            'profiles' => $profiles,
+            'feature_matrix' => array_values($featureMap),
+            'counts' => ['requested' => count($identifiers), 'found' => count($profiles)],
+            'distances' => $distances,
+            'distance_method' => 'Sólo compara rasgos numéricos observados en el mismo perfil y usa ponderación uniforme.',
+            'warnings' => $warnings,
+            'data_quality' => ['measured' => true, 'calculated' => true, 'inferred' => false, 'external' => false],
+        ];
+    }
+
+    /** Lectura de estándares comerciales sin modificar tablas del ERP. */
+    public function marketStandards(?int $marketId = null): array
+    {
+        $query = Stdmarket::query()->with('market');
+        if ($marketId !== null) {
+            $query->where('market_id', $marketId);
+        }
+        return $query->get()->map(function ($row) {
+            return [
+                'id' => (int) $row->id,
+                'name' => (string) $row->name,
+                'value' => $row->value,
+                'market_id' => $row->market_id !== null ? (int) $row->market_id : null,
+                'market' => optional($row->market)->name,
+                'varieties_reference' => $row->varities_string,
+            ];
+        })->values()->all();
+    }
+
+    /** Lectura de rendimientos relativos y sus referencias. */
+    public function relativeYields(?int $marketId = null): array
+    {
+        $query = Relativeyield::query()->with('relativeyieldvarities');
+        if ($marketId !== null) {
+            $query->where('market_id', $marketId);
+        }
+        return $query->get()->map(function ($row) {
+            return [
+                'id' => (int) $row->id,
+                'name' => (string) $row->name,
+                'std' => $row->std,
+                'market_id' => $row->market_id !== null ? (int) $row->market_id : null,
+                'variety_ids' => $row->relativeyieldvarities->pluck('varity_id')->map(function ($id) {
+                    return (int) $id;
+                })->values()->all(),
+            ];
+        })->values()->all();
+    }
+
+    /** Estado agregado de invernaderos; no expone agricultores ni clientes. */
+    public function greenhouseStatus(): array
+    {
+        return GreenHouse::query()->withCount('characteristic')->get()->map(function ($row) {
+            return [
+                'id' => (int) $row->id,
+                'name' => (string) $row->name,
+                'variety_count' => (int) $row->characteristic_count,
+            ];
+        })->values()->all();
+    }
+
+    /**
+     * Resumen agregado de trazabilidad. No expone agricultores, clientes,
+     * predios ni identificadores personales.
+     */
+    public function traceabilitySummary(?string $identifier = null): array
+    {
+        $query = Traceability::query()->with('varity:id,code,name');
+        if ($identifier !== null && trim($identifier) !== '') {
+            $variety = $this->findVariety($identifier);
+            if (!$variety) {
+                return ['found' => false, 'identifier' => $identifier, 'records' => [], 'warnings' => ['Variedad no encontrada.']];
+            }
+            $query->where('varity_id', $variety->id);
+        }
+
+        $rows = $query->get();
+        $groups = $rows->groupBy('varity_id')->map(function ($items) {
+            $variety = optional($items->first()->varity);
+            return [
+                'variety' => ['id' => $variety->id, 'code' => $variety->code, 'name' => $variety->name],
+                'records' => $items->count(),
+                'quantity_total' => $items->sum(fn ($item) => is_numeric($item->quantity) ? (float) $item->quantity : 0),
+                'production_total' => $items->sum(fn ($item) => is_numeric($item->production) ? (float) $item->production : 0),
+                'certifications' => $items->pluck('certifies_id')->filter()->unique()->values()->all(),
+            ];
+        })->values()->all();
+
+        return [
+            'found' => true,
+            'records' => $groups,
+            'counts' => ['groups' => count($groups), 'source_records' => $rows->count()],
+            'privacy' => ['personal_data_excluded' => true, 'fields_excluded' => ['farmer_id', 'land_id', 'client_id']],
+            'warnings' => ['Resumen agregado; no representa una ficha individual ni autoriza escrituras.'],
+            'data_quality' => ['measured' => true, 'calculated' => true, 'inferred' => false, 'external' => false],
+        ];
+    }
+
+    /** Diagnóstico de calidad en modo lectura, sin corregir datos automáticamente. */
+    public function dataQualitySummary(): array
+    {
+        $varieties = Varity::withTrashed();
+        $characteristics = Characteristic::query();
+        $duplicateCodes = Varity::query()->whereNotNull('code')->where('code', '!=', '')
+            ->select('code')->groupBy('code')->havingRaw('COUNT(*) > 1')->pluck('code')->values()->all();
+
+        return [
+            'scope' => ['tables' => ['varities', 'characteristics'], 'read_only' => true],
+            'varieties' => [
+                'total' => (int) $varieties->count(),
+                'null_code' => (int) (clone $varieties)->whereNull('code')->count(),
+                'empty_code' => (int) (clone $varieties)->where('code', '=', '')->count(),
+                'null_name' => (int) (clone $varieties)->whereNull('name')->count(),
+                'empty_name' => (int) (clone $varieties)->where('name', '=', '')->count(),
+                'null_year' => (int) (clone $varieties)->whereNull('year')->count(),
+                'duplicate_codes' => $duplicateCodes,
+            ],
+            'characteristics' => [
+                'total' => (int) $characteristics->count(),
+                'null_value' => (int) (clone $characteristics)->whereNull('value')->count(),
+                'empty_value' => (int) (clone $characteristics)->where('value', '=', '')->count(),
+                'null_feature_id' => (int) (clone $characteristics)->whereNull('feature_id')->count(),
+                'null_varity_id' => (int) (clone $characteristics)->whereNull('varity_id')->count(),
+            ],
+            'warnings' => ['Los conteos son diagnósticos; no se corrigen datos automáticamente.'],
+        ];
+    }
+
+    protected function findVariety(string $identifier)
+    {
+        $identifier = trim($identifier);
+        if ($identifier === '') {
+            return null;
+        }
+        $query = Varity::withTrashed();
+        if (ctype_digit($identifier)) {
+            $query->where('id', (int) $identifier);
+        } else {
+            $query->where(function ($builder) use ($identifier) {
+                $builder->where('code', $identifier)->orWhere('name', $identifier);
+            });
+        }
+        return $query->first();
+    }
+
+    protected function varietyIdentity($variety): array
+    {
+        $code = trim((string) $variety->code);
+        $name = trim((string) $variety->name);
+        $mother = $this->parentIdentity($variety->mother_id);
+        $father = $this->parentIdentity($variety->father_id);
+        return [
+            'id' => (int) $variety->id,
+            'code' => $code !== '' ? $code : null,
+            'name' => $name !== '' ? $name : null,
+            'label' => $code !== '' ? $code : ($name !== '' ? $name : '#'.$variety->id),
+            'year' => $variety->year !== null ? (int) $variety->year : null,
+            'market_id' => $variety->market_id !== null ? (int) $variety->market_id : null,
+            'mother_id' => $variety->mother_id !== null ? (int) $variety->mother_id : null,
+            'father_id' => $variety->father_id !== null ? (int) $variety->father_id : null,
+            // Presentación legible para IA y usuarios; los *_id se conservan
+            // únicamente para trazabilidad técnica y compatibilidad.
+            'mother' => $mother,
+            'father' => $father,
+            'mother_label' => $mother['label'],
+            'father_label' => $father['label'],
+        ];
+    }
+
+    protected function parentIdentity($parentId): array
+    {
+        if ($parentId === null || $parentId === '') {
+            return ['id' => null, 'code' => null, 'name' => null, 'label' => 'Sin información', 'found' => false];
+        }
+
+        $parent = Varity::withTrashed()->find((int) $parentId);
+        if (!$parent) {
+            return ['id' => (int) $parentId, 'code' => null, 'name' => null, 'label' => 'Sin información', 'found' => false];
+        }
+
+        $code = trim((string) $parent->code);
+        $name = trim((string) $parent->name);
+        $label = $code !== '' ? $code : ($name !== '' ? $name : 'Sin información');
+        return [
+            'id' => (int) $parent->id,
+            'code' => $code !== '' ? $code : null,
+            'name' => $name !== '' ? $name : null,
+            'label' => $label,
+            'found' => true,
+        ];
+    }
+
+    protected function lineageNodes($variety, int $remaining, array $seen): array
+    {
+        if ($remaining < 0 || in_array((int) $variety->id, $seen, true)) {
+            return [];
+        }
+        $seen[] = (int) $variety->id;
+        $node = $this->varietyIdentity($variety);
+        $node['has_measured_data'] = Characteristic::where('varity_id', $variety->id)->where('value', '!=', '')->exists();
+        $node['parents'] = [];
+        foreach (['mother' => $variety->mother_id, 'father' => $variety->father_id] as $role => $parentId) {
+            if (!$parentId) {
+                continue;
+            }
+            $parent = Varity::withTrashed()->find($parentId);
+            if (!$parent) {
+                $node['parents'][] = ['role' => $role, 'id' => (int) $parentId, 'found' => false];
+                continue;
+            }
+            $parentNode = $this->varietyIdentity($parent);
+            $parentNode['role'] = $role;
+            $parentNode['found'] = true;
+            $parentNode['has_measured_data'] = Characteristic::where('varity_id', $parent->id)->where('value', '!=', '')->exists();
+            if ($remaining > 0) {
+                $parentNode['parents'] = $this->lineageNodes($parent, $remaining - 1, $seen);
+            }
+            $node['parents'][] = $parentNode;
+        }
+        return [$node];
+    }
+
+    protected function queryId(): string
+    {
+        try {
+            return bin2hex(random_bytes(16));
+        } catch (\Exception $exception) {
+            return uniqid('novaseed_', true);
+        }
+    }
+}

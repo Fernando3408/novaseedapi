@@ -1,0 +1,167 @@
+@extends('layouts.app')
+@section('content')
+@php
+    use App\Models\Position;
+@endphp
+<div class="m-portlet m-portlet--head-solid-bg m-portlet--rounded">
+    <div class="m-portlet__head">
+        <div class="m-portlet__head-caption">
+            <div class="m-portlet__head-title">
+                <span class="m-portlet__head-icon">
+                    <i class="flaticon-calendar"></i>
+                </span>
+                <h3 class="m-portlet__head-text">
+                    Variedades
+                </h3>
+            </div>          
+        </div>
+        <div class="m-portlet__head-tools">
+            <ul class="m-portlet__nav">
+                <li class="m-portlet__nav-item">
+                    <a href="{{ route('varities.create') }}" class="m-portlet__nav-link btn btn-outline-primary m-btn m-btn--outline-2x ">
+                        Crear Variedad
+                    </a>
+                </li>
+                <li class="m-portlet__nav-item">
+                    <a class="m-portlet__nav-link btn btn-outline-warning m-btn m-btn--outline-2x ">
+                        Limpiar Variedades
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="m-portlet__body">
+        <table class="table table-striped- table-bordered table-hover table-checkable datatables_p" id="table-cross">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Nombre</th>
+                    <th>Ensayo</th>
+                    <th>Datos</th>
+                    <th>Padre Cruce</th>
+                    <th>Padre Variedad</th>
+                    <th style="width:350px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if(!empty($varities))
+                    @foreach($varities as $record)
+                        <tr>
+                            <td>{{$record->id}}</td>
+                            <td>{{!empty($record->name) ? $record->name : $record->code}}</td>
+                            <td>{{$record->in_ensayo}}</td>
+                            <td>{{$record->characteristics_count}}</td>
+                            <td>{{$record->crossings_children}}</td>
+                            <td>{{$record->variety_children}}</td>
+                            <td>
+                                <center>
+                                   <a class="btn btn-outline-info btn-sm" href="{{ route('varities.show',$record->id) }}">Ver</a>
+                                    {!! Form::open(['method' => 'DELETE','route' => ['varities.destroy', $record->id],'style'=>'display:inline']) !!}
+                                    {!! Form::submit('Eliminar', ['class' => 'btn btn-outline-danger btn-sm', 'attr-id' => $record->id]) !!}
+                                    {!! Form::close() !!}
+                                </center>
+                            </td>
+                        </tr>
+                    @endforeach
+                @endif
+            </tbody>
+        </table>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $(".table").DataTable({
+            
+        })
+
+        $(".btn-outline-warning").click(function(e){
+
+            swal(
+                {
+                    title: "Se eliminaran un total de  variedades",
+                    // text:", los que caeran en la papelera.",
+                    type:"warning",
+                    showCancelButton:!0,
+                    confirmButtonText:"Si, enviar a papelera",
+                    cancelButtonText:"No, cancelar",
+                    reverseButtons:!0
+                }
+            ).then(function(e){
+                if(e.value){
+                   $.ajax({
+                        url: '/delete_final_boss',
+                        type: 'get',
+                        dataType: 'json',
+                        // data: {id: id}
+                    }).done(function(data) {
+                        Swal({
+                          title: 'Variedades eliminadas correctamente.',
+                          text: "",
+                          type: 'success',
+                          showCancelButton: false,
+                          showConfirmButton: false,
+                        })
+                    })
+                }else{
+                    return false;
+                }
+            })
+            return false;
+        })
+
+        $(".btn-outline-danger").click(function(e){
+
+            e.preventDefault()
+            var element = $(this)
+            id = $(element).attr('attr-id')
+            
+            $.ajax({
+                url: '/varity/check_to_delete',
+                type: 'get',
+                dataType: 'json',
+                data: {id: id}
+            }).done(function(data) {
+                if(data.status){
+                    swal(
+                        {
+                            title: data.msj,
+                            text:"Si elimina el registro este desaparecera del sistema pero quedara en papelera.",
+                            type:"warning",
+                            showCancelButton:!0,
+                            confirmButtonText:"Si, enviar a papelera",
+                            cancelButtonText:"No, continuar",
+                            reverseButtons:!0
+                        }
+                    ).then(function(e){
+                        if(e.value){
+                           $(element).parent().submit()
+                        }else{
+                            return false;
+                        }
+                    })
+                    return false;
+                }else{
+                    swal(
+                        {
+                            title: data.msj,
+                            text:"Si elimina el registro este desaparecera del sistema",
+                            type:"warning",
+                            showCancelButton:!0,
+                            confirmButtonText:"Si, eliminar",
+                            cancelButtonText:"No, continuar",
+                            reverseButtons:!0
+                        }
+                    ).then(function(e){
+                        if(e.value){
+                           $(element).parent().submit()
+                        }else{
+                            return false;
+                        }
+                    })
+                    return false;
+                }
+            })
+        })
+    });
+</script>
+@endsection

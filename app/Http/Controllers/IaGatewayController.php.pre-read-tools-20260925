@@ -1,0 +1,212 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Services\NovaSeedIaGateway;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+
+class IaGatewayController extends Controller
+{
+    /**
+     * Publica el contrato de capacidades para el integrador IA.
+     *
+     * La ruta sólo describe capacidades y no expone datos agrícolas. Las
+     * consultas de negocio continuarán usando las rutas ERP existentes hasta
+     * que se configure autenticación de cuenta de servicio.
+     *
+     * @return JsonResponse
+     */
+    public function capabilities(): JsonResponse
+    {
+        $this->authorizeGateway(request());
+        return response()->json((new NovaSeedIaGateway())->capabilities());
+    }
+
+    /**
+     * Ejecuta la búsqueda existente y la devuelve con el contrato IA.
+     *
+     * Se mantiene una ruta separada para no cambiar el payload histórico de
+     * /api/results/search, que puede ser consumido por otras pantallas.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function searchResults(Request $request): JsonResponse
+    {
+        $this->authorizeGateway($request);
+        $legacyResponse = (new ApiController())->searchResults($request);
+        $payload = $legacyResponse->getData(true);
+        $results = isset($payload['results']) && is_array($payload['results'])
+            ? $payload['results']
+            : [];
+        $parents = isset($payload['parents']) && is_array($payload['parents'])
+            ? $payload['parents']
+            : [];
+        $warnings = [];
+
+        if (empty($results)) {
+            $warnings[] = 'La consulta no devolvió variedades con los filtros recibidos.';
+        }
+
+        if (!empty($parents) && count($parents) < (int) ($payload['results_count'] ?? 0)) {
+            $warnings[] = 'La respuesta contiene padres agregados por referencia, no necesariamente fichas evaluadas.';
+        }
+
+        $missingFields = [];
+        $resultKeys = [];
+        $duplicateResults = [];
+        foreach ($results as $index => $result) {
+            $resultKey = (string) ($result['code'] ?? $result['name'] ?? $result['id'] ?? '');
+            if ($resultKey !== '') {
+                if (isset($resultKeys[$resultKey])) {
+                    $duplicateResults[] = $resultKey;
+                }
+                $resultKeys[$resultKey] = true;
+            }
+            foreach (['id', 'code', 'name', 'year'] as $field) {
+                if (!array_key_exists($field, $result) || $result[$field] === null || $result[$field] === '') {
+                    $missingFields[] = "results[{$index}].{$field}";
+                }
+            }
+            foreach ((array) ($result['features'] ?? []) as $featureIndex => $feature) {
+                foreach (['feature_id', 'feature_name', 'promedio'] as $field) {
+                    if (!array_key_exists($field, $feature) || $feature[$field] === null || $feature[$field] === '') {
+                        $missingFields[] = "results[{$index}].features[{$featureIndex}].{$field}";
+                    }
+                }
+            }
+        }
+        $missingFields = array_values(array_unique($missingFields));
+        $duplicateResults = array_values(array_unique($duplicateResults));
+        $parentsWithoutFicha = [];
+        foreach ($parents as $parent) {
+            $parentKey = (string) ($parent['code'] ?? $parent['name'] ?? $parent['id'] ?? '');
+            if ($parentKey !== '' && array_key_exists('has_measured_data', $parent) && !$parent['has_measured_data']) {
+                $parentsWithoutFicha[] = $parentKey;
+            }
+        }
+        if (!empty($duplicateResults)) {
+            $warnings[] = 'La respuesta contiene identificadores de resultados duplicados.';
+        }
+        if (!empty($parentsWithoutFicha)) {
+            $warnings[] = 'Algunos progenitores aparecen por genealogía o referencia, pero no tienen ficha medida propia.';
+        }
+
+        $gateway = new NovaSeedIaGateway();
+
+        return response()->json($gateway->envelope(
+            'search_results',
+            array_merge($request->all(), [
+                'locality_id_resolved' => $payload['locality_id'] ?? null,
+            ]),
+            $results,
+            $parents,
+            $warnings,
+            [
+                'measured' => true,
+                'missing_count' => count($missingFields),
+                'missing_fields' => $missingFields,
+                'duplicate_results' => $duplicateResults,
+                'parents_without_measured_profile' => array_values(array_unique($parentsWithoutFicha)),
+            ]
+        ));
+    }
+
+    /**
+     * Publica el catálogo de características con la misma envoltura IA.
+     *
+     * @return JsonResponse
+     */
+    public function catalog(): JsonResponse
+    {
+        $this->authorizeGateway(request());
+        $legacyResponse = (new ApiController())->featuresCatalog();
+
+        return response()->json(
+            (new NovaSeedIaGateway())->document('catalog_features', $legacyResponse->getData(true))
+        );
+    }
+
+    /**
+     * Publica la guía de construcción de consultas del ERP.
+     *
+     * @return JsonResponse
+     */
+    public function queryGuide(): JsonResponse
+    {
+        $this->authorizeGateway(request());
+        $legacyResponse = (new ApiController())->resultsQueryGuide();
+
+        return response()->json(
+            (new NovaSeedIaGateway())->document('build_result_query', $legacyResponse->getData(true))
+        );
+    }
+
+    /** Perfil medido de una variedad por código, nombre o ID. */
+    public function varietyProfile(Request $request, string $identifier): JsonResponse
+    {
+        $this->authorizeGateway($request);
+        $data = (new NovaSeedIaGateway())->varietyProfile(
+            $identifier,
+            $request->filled('locality_id') ? (int) $request->input('locality_id') : null
+        );
+        if (empty($data['found'])) {
+            return response()->json([
+                'error' => 'not_found',
+                'error_code' => 'VARIETY_NOT_FOUND',
+                'message' => 'Variedad no encontrada.',
+                'identifier' => $identifier,
+            ], 404);
+        }
+        return response()->json((new NovaSeedIaGateway())->document('variety_profile', $data));
+    }
+
+    /** Genealogía acotada; sólo devuelve nodos y si tienen mediciones propias. */
+    public function lineage(Request $request, string $identifier): JsonResponse
+    {
+        $this->authorizeGateway($request);
+        $data = (new NovaSeedIaGateway())->lineage($identifier, (int) $request->input('depth', 3));
+        if (empty($data['found'])) {
+            return response()->json(['error' => 'not_found', 'error_code' => 'VARIETY_NOT_FOUND', 'message' => 'Variedad no encontrada.'], 404);
+        }
+        return response()->json((new NovaSeedIaGateway())->document('lineage', $data));
+    }
+
+    /** Comparación de perfiles observados; no presenta inferencias como mediciones. */
+    public function compare(Request $request): JsonResponse
+    {
+        $this->authorizeGateway($request);
+        $identifiers = $request->input('identifiers', []);
+        if (is_string($identifiers)) {
+            $identifiers = preg_split('/\s*,\s*/', $identifiers, -1, PREG_SPLIT_NO_EMPTY);
+        }
+        if (!is_array($identifiers) || count($identifiers) < 2) {
+            return response()->json([
+                'error' => 'invalid_request',
+                'error_code' => 'IDENTIFIERS_REQUIRED',
+                'message' => 'Se requieren al menos dos identificadores de variedades.',
+            ], 422);
+        }
+        $data = (new NovaSeedIaGateway())->compareVarieties(
+            $identifiers,
+            $request->filled('locality_id') ? (int) $request->input('locality_id') : null
+        );
+        return response()->json((new NovaSeedIaGateway())->document('compare_varieties', $data));
+    }
+
+    /** Autoriza al servicio IA mediante secreto compartido y falla cerrado. */
+    private function authorizeGateway(Request $request): void
+    {
+        $expected = (string) env('NOVASEED_IA_TOKEN', '');
+        $provided = (string) $request->header('X-NovaSeed-IA-Token', '');
+
+        if ($expected === '' || $provided === '' || !hash_equals($expected, $provided)) {
+            abort(response()->json([
+                'error' => 'unauthorized',
+                'error_code' => 'IA_TOKEN_INVALID',
+                'message' => 'Token de servicio inválido o ausente.',
+            ], 401));
+        }
+    }
+}

@@ -1,0 +1,999 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Varity;
+use App\Models\Feature;
+use App\Models\Characteristic;
+use App\Models\Multimedia;
+use App\Models\Typefeature;
+use App\Models\Value;
+use App\Models\Market;
+use App\Models\Blocksvarity;
+use App\Models\Binnacle;
+use Intervention\Image\Facades\Image;
+use Illuminate\Support\Str as Str;
+use Auth;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
+use App\Avg_characteristic;
+use App\Fries_avg_characteristics;
+
+
+
+class VarityController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        $varities = Varity::where('name', '!=', '')->get();
+        //$varities = Varity::where('crossing',0)->get();
+
+        return View('varities.index',compact('varities'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        $markets = Market::pluck('name','id');
+
+        //listado de variedades o cruces
+        $va = Varity::All();
+        $varities = array();
+        foreach ($va as $v) {
+            if($v->crossing){
+                if(!empty($v->code)){
+                    $varities[$v->id] = $v->code;
+                }
+            }else{
+                 $varities[$v->id] = $v->name;
+            }
+        }
+        return View('varities.create',compact('varities','markets'));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        if(Varity::where('slug',Str::slug($request->input('name')))->first()){
+            return redirect()->route('varities.index')->with('alert','Ya existe una variedad con ese nombre.');
+        }
+        $request->merge([
+            'slug' => $request->input('name'),
+            'marketold_id' => $request->input('market_id')
+        ]);
+
+
+        Varity::create($request->all());
+
+        return redirect()->route('varities.index')
+                        ->with('success','Característica creada correctamente.');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Varity  $feature
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Varity $varity)
+    {   
+        /*
+        if($varity->crossing == 1){
+            return redirect('/crossings/'.$varity->id);
+        }*/
+
+        $typesfeatures = Typefeature::where('status', 1)->get();
+
+        foreach ($typesfeatures as $t_key => $t) {
+            $m = $t->features()->where('status',1)->orderBy('id', 'asc')->get();
+
+            foreach ($m as $key => $f) {
+
+                $c = Characteristic::select('value')->where('varity_id',$varity->id)->where('feature_id',$f->id)->where('value','!=', '')->get();
+
+                if(!empty($c) && $c->count() > 0){
+                    if(is_numeric($c[0]->value)){
+
+                        if($f->id == 16 || $f->id == 18){
+                            #$typesfeatures[$t_key]->features[$key]->promedio = $c[0]->value;
+                            foreach ($typesfeatures[$t_key]->features as $key_ => $val) {
+                                if($val->id == $f->id){
+                                    $typesfeatures[$t_key]->features[$key_]->promedio = $c[0]->value;
+                                    $typesfeatures[$t_key]->features[$key_]->std = $this->stats_standard_deviation($c);
+                                }
+                            }
+                        }else{
+                            foreach ($typesfeatures[$t_key]->features as $key_ => $val) {
+                                if($val->id == $f->id){
+                                    $typesfeatures[$t_key]->features[$key_]->promedio = (int)$c->avg('value');
+                                    $typesfeatures[$t_key]->features[$key_]->std = $this->stats_standard_deviation($c);
+                                }
+                            }
+                        }
+                        
+                    }else{
+                        $typesfeatures[$t_key]->features[$key]->promedio = @$c->first()->value;
+                        $typesfeatures[$t_key]->features[$key]->std = "-";
+                    }
+                }
+            }
+        }
+
+        $childrens = Varity::whereNotNull('name')->where('mother_id',$varity->id)->orWhere('father_id',$varity->id)->get();
+        $tree = Varity::whereIn('mother_id',[$varity->father_id, $varity->mother_id])->whereIn('father_id',[$varity->father_id, $varity->mother_id])->get();
+
+        $count_childrens = count($childrens);
+        $nietos = 0;
+        if($count_childrens > 0){
+            foreach ($childrens as $key => $value) {
+                $count = Varity::whereNotNull('name')->where('mother_id',$value->id)->orWhere('father_id',$value->id)->count();
+                $nietos += $count;
+            }
+        }
+
+        $blocks = Blocksvarity::where('varity_id', $varity->id)->get();
+        
+        #dd("hijos:".$count_childrens."--- Nietos:".$nietos);
+
+        return View('varities.show',compact('varity','typesfeatures','tree', 'ancesters', 'childrens', 'blocks'));
+    }
+
+
+
+##### PARA PROBAR A
+    public function ancesters ($id, $max_level, $actual_level){
+        /*
+        $tree[$actual_level] = [];
+        dd($tree);
+
+        while ($actual_level < $max_level) {
+            $actual_level++;
+            $varity = Varity::where('mother_id',$varity->id)->orWhere('father_id',$varity->id)->get();
+
+        }
+        */
+        $varity = Varity::find($id); #PERSONA -> PADRE - MADRE LVL 1
+
+        $father = $varity->father_id; #RUT PADRE -> LVL 2
+        $mother = $varity->mother_id; #RUT MADRE
+
+
+        $ancesters = $this->search_ancesters($mother, $father, 4, 3);
+
+        return $ancesters;
+    }
+
+    public function search_ancesters ($id_mother,$id_father, $max_level, $actual_level){
+        $parents = [];
+       
+        while ($actual_level < $max_level) {
+            $actual_level++;
+
+            $nodo1 = Varity::find($id_mother);
+            $nodo2 = Varity::find($id_father);
+            /*
+            $parents["nodo1"] = $this->search_ancesters($nodo1->mother_id, $nodo1->father_id, $max_level, $actual_level);
+            $parents["nodo2"] = $this->search_ancesters($nodo2->mother_id, $nodo2->father_id, $max_level, $actual_level);
+            */
+            $parents["nodo1"] = ["mother_id" => @$nodo1->mother_id,"father_id" => @$nodo1->father_id];
+            $parents["nodo2"] = ["mother_id" => @$nodo2->mother_id,"father_id" => @$nodo2->father_id];
+
+        }
+
+       return $parents;
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Models\Feature  $feature
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Varity $varity)
+    {
+        $markets = Market::pluck('name','id');
+        //listado de variedades o cruces
+        $va = Varity::All();
+        $varities = array();
+        foreach ($va as $v) {
+            if($v->crossing){
+                if(!empty($v->code)){
+                    $varities[$v->id] = $v->code;
+                }
+            }else{
+                 $varities[$v->id] = $v->name;
+            }
+        }
+        return view('varities.edit',compact('varity','markets','varities'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Varity  $feature
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, Varity $varity)
+    {
+
+        if($varity->marketold_id == null){
+            $request->merge([
+                'marketold_id' => $request->input('market_id')
+            ]);
+        }
+
+        $varity->update($request->all());
+
+        return redirect()->route('varities.index')
+                        ->with('success','Variedad editada corectamente.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Feature  $feature
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Varity $varity)
+    {
+        $varity->delete();
+
+        /*
+        if(){
+
+        }
+        */
+
+        return redirect()->route('varities.index')
+                        ->with('success','Característica eliminada correctamente.');
+    }
+
+    public function saveCharacteristics(Request $request){
+        Characteristic::where('varity_id',$request->input('crossing_id'))->delete();
+
+        foreach($request->input('feature') as $year => $features){
+           foreach ($features as $f) {
+               if(!empty($f['value'])){
+                    $characteristic = new Characteristic();
+                    $characteristic->value = $f['value'];
+                    $characteristic->varity_id = $request->input('crossing_id');
+                    $characteristic->feature_id = $f['feature_id'];
+                    $characteristic->year = $year;
+                    $characteristic->save();
+                }
+           }
+        }
+
+        return redirect('varities/'.$request->input('crossing_id'))
+                        ->with('success','Características guardadas correctamente.');
+    }
+
+    public function addFeature(){
+
+        if(isset($_GET['fries'])){
+            $features = Feature::OrderBy('typefeature_id')->whereIn('id', [48,49,50,51])->pluck('name','id');    
+        }else{
+            $features = Feature::OrderBy('typefeature_id')->pluck('name','id');    
+        }
+        
+        return View('varities.addCharacteristic',compact('features'));
+    }
+
+    public function addValues(){
+        $feature = Feature::where('id',$_GET['feature'])->first();
+        $values = Value::where('feature_id',$_GET['feature'])->get();
+        return View('varities.addValues',compact('feature','values'));
+    }
+ 
+    public function searchHome(Request   $request){
+
+        $varities =  null;
+        
+        if( !function_exists('array_key_last') ) {
+            function array_key_last(array $array) {
+                if( !empty($array) ) return key(array_slice($array, -1, 1, true));
+            }
+        }
+
+        $key_last = array_key_last($request->data);
+        $keys_ = [];
+        $varity_array = [];
+        $varity_array_2 = [];
+        $varity_list = [];
+
+        #busqueda por ensayo:
+        if($request->block && !isset($request->only_childrens)){
+
+            $block_varity = Varity::whereHas('blocksvarity', function (Builder $query) use($request) {
+                                    $query->whereBlock_id($request->block);
+                                })->get();
+
+            foreach ($block_varity as $key_ => $value_) {
+                $varity_array[$value_->id][$value_->feature_id]["promedio"] = $value_->PROMEDIO;
+                $varity_list[] = $value_->id;
+            }
+        }
+
+        #busqueda por hijos
+        if(isset($request->only_childrens)){
+
+            if($request->block){
+                $varity_list = array();
+                $varity_array = array();
+            }
+
+            $childrens = Varity::Where('father_id', $request->varities_list)->orWhere('mother_id', $request->varities_list)->get();
+
+            foreach ($childrens as $key_ => $value_) {
+                if(!empty($value_->name)){
+                    $varity_array[$value_->id][$value_->feature_id]["promedio"] = $value_->PROMEDIO;
+                    $varity_list[] = $value_->id;
+                }
+            }
+        }
+
+        foreach ($request->data as $key => $value) {
+
+            if(is_array($value)){
+                # RANGOS
+                if(isset($request->operator[$key]) && $request->operator[$key] == "-"){
+                    $pos = strpos($value, ";");
+                    if($pos !== false){
+                        $pos = explode(";", $value);
+                        $max = $pos[1];
+                        $min = $pos[0];
+                    }else{
+                        #Valores normales
+                        $max = array_keys($value, max($value))[0];
+                        $min = array_keys($value, min($value))[0];
+                        is_numeric($min) ? (float) $min :  "";
+                        is_numeric($max) ? (float) $max :  "";
+                    }
+                }else{
+                    $max = array_keys($value, max($value))[0];
+                    $min = array_keys($value, min($value))[0];
+                    is_numeric($min) ? (float) $min :  "";
+                    is_numeric($max) ? (float) $max :  "";
+                }
+            }else{
+                # RANGOS
+                $pos = strpos($value, ";");
+
+                if($pos !== false){
+                    $pos = explode(";", $value);
+                    $max = $pos[1];
+                    $min = $pos[0];
+                }else{
+                    #Valores normales
+                    $max = null;
+                    $min = $value;
+                }
+            }
+
+            #Orden al imprimir los datos en la vista
+            $keys_[$key] = $max;
+
+            #Segunda iteracion, excepto cuando viene un ensayo seleccionado
+            if(!empty($varity_array)){
+                $max == null ? $max = 0 : '';
+                if( is_numeric($max) && is_numeric($min) && $max == 0 && $min == 0){
+                    $varities = Varity::whereNotNull('name')->whereIn('id',$varity_list)->whereDoesntHave('characteristics', function (Builder $query) use($key,$min,$max, $value, $request) {
+                        $query->where("feature_id", $key);
+                    })->get();
+
+                    $llave= $key;
+                    $varity_array = [];
+                    $varity_list = [];
+
+                    foreach ($varities as $key_ => $value_) {
+                        $varity_array[$value_->id][$llave]["promedio"] = 0;
+                        $varity_list[] = $value_->id;
+                    }
+
+
+                    break;
+
+                }else if( is_numeric($max) && is_numeric($min) && $max > 0 && $max != $min){
+                    $varities = Avg_characteristic::where("feature_id", $key)->whereBetween("PROMEDIO",[$min, $max])->whereIn('varity_id',$varity_list);
+
+                }else{
+
+                    #VALOR UNICO CON OPERADOR LOGICO
+                    if(isset($request->operator[$key])){
+                        if($min > 0){
+                            $varities = Avg_characteristic::where("feature_id", $key)
+                                                        ->where("PROMEDIO", $request->operator[$key],(int)$min)
+                                                        ->whereIn('varity_id',$varity_list);
+                        }else{
+                            $varities = Avg_characteristic::where("feature_id", $key)->where("PROMEDIO", $request->operator[$key], 0)->whereIn('varity_id',$varity_list);
+                        }
+                    }else{
+                        #VALOR UNICO NUMERICO
+                        if(is_numeric($min)){
+                            $varities = Avg_characteristic::where("feature_id", $key)
+                                         ->where("PROMEDIO",(int)$min)->whereIn('varity_id',$varity_list);
+                        }
+
+                        # STRING
+                        if(is_string($min)){
+
+                            $varities = Avg_characteristic::where("feature_id", $key)->where("PROMEDIO",'like',$min)->whereIn('varity_id',$varity_list);
+
+                            if($max != null  and  $max != $min){
+                                $varities->where("feature_id", $key)->orWhere("PROMEDIO",'like',$max)->whereIn('varity_id',$varity_list);
+                            }
+                        }
+                    }
+                }
+
+                #Resultados
+                $varity_list = [];
+
+                foreach ($varities->get() as $key_ => $value_) {
+                    if($value_->feature_id == $key){
+                        $varity_array[$value_->varity_id][$value_->feature_id]["promedio"] = $value_->PROMEDIO;
+                        $varity_list[] = $value_->varity_id;
+                    }
+                }
+
+            }else{
+
+                if(is_numeric($max) && is_numeric($min) && $max == 0 && $min == 0){
+                    $varities = Varity::whereNotNull('name')->whereDoesntHave('characteristics', function (Builder $query) use($key,$min,$max, $value, $request) {
+                        $query->where("feature_id", $key);
+                    })->get();
+
+                    foreach ($varities as $key_ => $value_) {
+                        $varity_array[$value_->id][$key]["promedio"] = 0;
+                        $varity_list[] = $value_->id;
+                    }
+                }else if(is_numeric($max) && is_numeric($min) && $max > 0 && $max != $min){
+                    $varities = Avg_characteristic::where("feature_id", $key)->whereBetween("PROMEDIO",[$min, $max]);
+                    $varities = $varities->get();
+
+                    foreach ($varities as $key_ => $value_) {
+                        $varity_array[$value_->varity_id][$value_->feature_id]["promedio"] = $value_->PROMEDIO;
+                        $varity_list[] = $value_->varity_id;
+                    }
+                }else{
+
+                    #VALOR UNICO CON OPERADOR LOGICO
+                    if(isset($request->operator[$key])){
+                        if($min > 0){
+                            $varities = Avg_characteristic::where("feature_id", $key)
+                                     ->where("PROMEDIO", $request->operator[$key],(int)$min);
+                        }else{
+                            $varities = Avg_characteristic::where("feature_id", $key)->where("PROMEDIO", $request->operator[$key], 0);
+                        }
+                    }else{
+                        #VALOR UNICO NUMERICO
+                        if(is_numeric($min)){
+                            $varities = Avg_characteristic::where("feature_id", $key)
+                                         ->where("PROMEDIO",(int)$min);
+                        }
+
+                        # STRING
+                        if(is_string($min)){
+                            $min = str_replace("'", "", $min);
+                            $max = str_replace("'", "", $max);
+
+                            $varities = Avg_characteristic::where("feature_id", $key)->where("PROMEDIO",'like',$min);
+
+                            if($max != null  and  $max != $min){
+                                $varities->orWhere("PROMEDIO",'like',$max);
+                            }
+                        }
+                    }
+
+                    $varities = $varities->get();
+
+                    foreach ($varities as $key_ => $value_) {
+                        $varity_array[$value_->varity_id][$value_->feature_id]["promedio"] = $value_->PROMEDIO;
+                        $varity_list[] = $value_->varity_id;
+                    }
+                }
+            }
+        }
+
+        $varities = $varity_list;
+        $varity_data = $varity_array;
+        $config_features = $keys_;
+        $fries = $request->fries;
+
+        dd($varity_data);
+
+        return View('varities.searchHome',compact('varities','varity_data','config_features', 'fries'));
+    }
+
+     public function searchHomeFries(Request   $request){
+
+        $varities =  null;
+        
+        if( !function_exists('array_key_last') ) {
+            function array_key_last(array $array) {
+                if( !empty($array) ) return key(array_slice($array, -1, 1, true));
+            }
+        }
+
+        $key_last = array_key_last($request->data);
+        $keys_ = [];
+        $varity_array = [];
+        $varity_array_2 = [];
+        $varity_list = [];
+
+        #busqueda por ensayo:
+        if($request->block && !isset($request->only_childrens)){
+
+            $block_varity = Varity::whereHas('blocksvarity', function (Builder $query) use($request) {
+                                    $query->whereBlock_id($request->block);
+                                })->get();
+
+            foreach ($block_varity as $key_ => $value_) {
+                $varity_array[$value_->id][$value_->feature_id]["promedio"] = $value_->PROMEDIO;
+                $varity_array[$value_->id][$value_->feature_id]["ponderado"] = $value_->ponderado;
+                $varity_list[] = $value_->id;
+            }
+        }
+
+        #busqueda por hijos
+        if(isset($request->only_childrens)){
+
+            $childrens = Varity::Where('father_id', $request->varities_list)->orWhere('mother_id', $request->varities_list)->get();
+
+            foreach ($childrens as $key_ => $value_) {
+                if(!empty($value_->name)){
+                    $varity_array[$value_->id][$value_->feature_id]["promedio"] = $value_->PROMEDIO;
+                    $varity_array[$value_->id][$value_->feature_id]["ponderado"] = $value_->ponderado;
+                    $varity_list[] = $value_->id;
+                }
+            }
+        }
+
+        foreach ($request->data as $key => $value) {
+
+            if(is_array($value)){
+                # RANGOS
+                if(isset($request->operator[$key]) && $request->operator[$key] == "-"){
+                    $pos = strpos($value, ";");
+                    if($pos !== false){
+                        $pos = explode(";", $value);
+                        $max = $pos[1];
+                        $min = $pos[0];
+                    }else{
+                        #Valores normales
+                        $max = array_keys($value, max($value))[0];
+                        $min = array_keys($value, min($value))[0];
+                        is_numeric($min) ? (float) $min :  "";
+                        is_numeric($max) ? (float) $max :  "";
+                    }
+                }else{
+                    $max = array_keys($value, max($value))[0];
+                    $min = array_keys($value, min($value))[0];
+                    is_numeric($min) ? (float) $min :  "";
+                    is_numeric($max) ? (float) $max :  "";
+                }
+            }else{
+                # RANGOS
+                $pos = strpos($value, ";");
+
+                if($pos !== false){
+                    $pos = explode(";", $value);
+                    $max = $pos[1];
+                    $min = $pos[0];
+                }else{
+                    #Valores normales
+                    $max = null;
+                    $min = $value;
+                }
+            }
+
+            #Orden al imprimir los datos en la vista
+            $keys_[$key] = $max;
+
+            #Segunda iteracion, excepto cuando viene un ensayo seleccionado
+            if(!empty($varity_array)){
+                $max == null ? $max = 0 : '';
+                if( is_numeric($max) && is_numeric($min) && $max == 0 && $min == 0){
+                    $varities = Varity::whereNotNull('name')->whereIn('id',$varity_list)->whereDoesntHave('characteristics', function (Builder $query) use($key,$min,$max, $value, $request) {
+                        $query->where("feature_id", $key);
+                    })->get();
+
+                    $llave= $key;
+                    $varity_array = [];
+                    $varity_list = [];
+
+                    foreach ($varities as $key_ => $value_) {
+                        $varity_array[$value_->id][$llave]["promedio"] = 0;
+                        $varity_list[] = $value_->id;
+                    }
+
+
+                    break;
+
+                }else if( is_numeric($max) && is_numeric($min) && $max > 0 && $max != $min){
+                    $varities = Fries_avg_characteristics::where("feature_id", $key)->whereBetween("PROMEDIO",[$min, $max])->whereIn('varity_id',$varity_list);
+
+                }else{
+
+                    #VALOR UNICO CON OPERADOR LOGICO
+                    if(isset($request->operator[$key])){
+                        if($min > 0){
+                            $varities = Fries_avg_characteristics::where("feature_id", $key)
+                                                        ->where("PROMEDIO", $request->operator[$key],(int)$min)
+                                                        ->whereIn('varity_id',$varity_list);
+                        }else{
+                            $varities = Fries_avg_characteristics::where("feature_id", $key)->where("PROMEDIO", $request->operator[$key], 0)->whereIn('varity_id',$varity_list);
+                        }
+                    }else{
+                        #VALOR UNICO NUMERICO
+                        if(is_numeric($min)){
+                            $varities = Fries_avg_characteristics::where("feature_id", $key)
+                                         ->where("PROMEDIO",(int)$min)->whereIn('varity_id',$varity_list);
+                        }
+
+                        # STRING
+                        if(is_string($min)){
+
+                            $varities = Fries_avg_characteristics::where("feature_id", $key)->where("PROMEDIO",'like',$min)->whereIn('varity_id',$varity_list);
+
+                            if($max != null  and  $max != $min){
+                                $varities->where("feature_id", $key)->orWhere("PROMEDIO",'like',$max)->whereIn('varity_id',$varity_list);
+                            }
+                        }
+                    }
+                }
+
+                #Resultados
+                $varity_list = [];
+
+                foreach ($varities->get() as $key_ => $value_) {
+                    if($value_->feature_id == $key){
+                        $varity_array[$value_->varity_id][$value_->feature_id]["promedio"] = $value_->PROMEDIO;
+                        $varity_array[$value_->varity_id][$value_->feature_id]["ponderado"] = $value_->ponderado;
+                        $varity_list[] = $value_->varity_id;
+                    }
+                }
+
+            }else{
+
+                if(is_numeric($max) && is_numeric($min) && $max == 0 && $min == 0){
+                    $varities = Varity::whereNotNull('name')->whereDoesntHave('characteristics', function (Builder $query) use($key,$min,$max, $value, $request) {
+                        $query->where("feature_id", $key);
+                    })->get();
+
+                    foreach ($varities as $key_ => $value_) {
+                        $varity_array[$value_->id][$key]["promedio"] = 0;
+                        $varity_list[] = $value_->id;
+                    }
+                }else if(is_numeric($max) && is_numeric($min) && $max > 0 && $max != $min){
+                    $varities = Fries_avg_characteristics::where("feature_id", $key)->whereBetween("PROMEDIO",[$min, $max]);
+                    $varities = $varities->get();
+
+                    foreach ($varities as $key_ => $value_) {
+                        $varity_array[$value_->varity_id][$value_->feature_id]["promedio"] = $value_->PROMEDIO;
+                        $varity_array[$value_->varity_id][$value_->feature_id]["ponderado"] = $value_->ponderado;
+                        $varity_list[] = $value_->varity_id;
+                    }
+                }else{
+
+                    #VALOR UNICO CON OPERADOR LOGICO
+                    if(isset($request->operator[$key])){
+                        if($min > 0){
+                            $varities = Fries_avg_characteristics::where("feature_id", $key)
+                                     ->where("PROMEDIO", $request->operator[$key],(int)$min);
+                        }else{
+                            $varities = Fries_avg_characteristics::where("feature_id", $key)->where("PROMEDIO", $request->operator[$key], 0);
+                        }
+                    }else{
+                        #VALOR UNICO NUMERICO
+                        if(is_numeric($min)){
+                            $varities = Fries_avg_characteristics::where("feature_id", $key)
+                                         ->where("PROMEDIO",(int)$min);
+                        }
+
+                        # STRING
+                        if(is_string($min)){
+                            $min = str_replace("'", "", $min);
+                            $max = str_replace("'", "", $max);
+
+                            $varities = Fries_avg_characteristics::where("feature_id", $key)->where("PROMEDIO",'like',$min);
+
+                            if($max != null  and  $max != $min){
+                                $varities->orWhere("PROMEDIO",'like',$max);
+                            }
+                        }
+                    }
+
+                    $varities = $varities->get();
+
+                    foreach ($varities as $key_ => $value_) {
+
+                        $varity_array[$value_->varity_id][$value_->feature_id]["promedio"] = $value_->PROMEDIO;
+                        $varity_array[$value_->varity_id][$value_->feature_id]["ponderado"] = $value_->ponderado;
+                        $varity_list[] = $value_->varity_id;
+                    }
+                }
+            }
+        }
+
+        $varities = $varity_list;
+        $varity_data = $varity_array;
+        $config_features = $keys_;
+        $fries = $request->fries;
+
+        return View('results.fries.searching',compact('varities','varity_data','config_features', 'fries'));
+    }
+
+    public function check_db(){
+
+        $varities = Varity::all();
+        $typefeatures = Typefeature::all();
+
+        return View('varities.exportaData',compact('varities', 'typefeatures'));
+
+    }
+
+    public function searchHomeCrossing(Request   $request){
+
+       $varities =  null;
+        if( !function_exists('array_key_last') ) {
+            function array_key_last(array $array) {
+                if( !empty($array) ) return key(array_slice($array, -1, 1, true));
+            }
+        }
+
+        $key_last = array_key_last($request->data);
+        $keys_ = [];
+        $varity_array = [];
+        $varity_array_2 = [];
+        $varity_list = [];
+
+        foreach ($request->data as $key => $value) {
+            if(is_array($value)){
+                # RANGOS
+                if(isset($request->operator[$key]) && $request->operator[$key] == "-"){
+                    $pos = strpos($value, ";");
+                    if($pos !== false){
+                        $pos = explode(";", $value);
+                        $max = $pos[1];
+                        $min = $pos[0];
+                    }else{
+                        #Valores normales
+                        $max = array_keys($value, max($value))[0];
+                        $min = array_keys($value, min($value))[0];
+                        is_numeric($min) ? (float) $min :  "";
+                        is_numeric($max) ? (float) $max :  "";
+                    }
+                }else{
+                    $max = array_keys($value, max($value))[0];
+                    $min = array_keys($value, min($value))[0];
+                    is_numeric($min) ? (float) $min :  "";
+                    is_numeric($max) ? (float) $max :  "";
+                }
+                
+            }else{
+                # RANGOS
+                $pos = strpos($value, ";");
+
+                if($pos !== false){
+                    $pos = explode(";", $value);
+                    $max = $pos[1];
+                    $min = $pos[0];
+                }else{
+                    #Valores normales
+                    $max = null;
+                    $min = $value;
+                }
+            }
+
+            #Orden al imprimir los datos en la vista
+            $keys_[$key] = $max;
+
+            if(!empty($varity_array)){
+                if($max > 0 && $max != $min){
+                    $varities = Avg_characteristic::where("feature_id", $key)->whereBetween("PROMEDIO",[$min, $max])->whereIn('varity_id',$varity_list);
+
+                }else{
+
+                    #VALOR UNICO CON OPERADOR LOGICO
+                    if(isset($request->operator[$key])){
+                        if($min > 0){
+                            $varities = Avg_characteristic::where("feature_id", $key)
+                                                        ->where("PROMEDIO", $request->operator[$key],(int)$min)
+                                                        ->whereIn('varity_id',$varity_list);
+                        }else{
+                            $varities = Avg_characteristic::where("feature_id", $key)->where("PROMEDIO", $request->operator[$key], 0)->whereIn('varity_id',$varity_list);
+                        }
+                    }else{
+                        #VALOR UNICO NUMERICO
+                        if(is_numeric($min)){
+                            $varities = Avg_characteristic::where("feature_id", $key)
+                                         ->where("PROMEDIO",(int)$min)->whereIn('varity_id',$varity_list);
+                        }
+
+                        # STRING
+                        if(is_string($min)){
+
+                            $varities = Avg_characteristic::where("feature_id", $key)->where("PROMEDIO",'like',$min)->whereIn('varity_id',$varity_list);
+
+                            if($max != null  and  $max != $min){
+                                $varities->where("feature_id", $key)->orWhere("PROMEDIO",'like',$max)->whereIn('varity_id',$varity_list);
+                            }
+                        }
+                    }
+                }
+
+                $varity_list = [];
+
+                foreach ($varities->get() as $key_ => $value_) {
+                    if($value_->feature_id == $key){
+                        $varity_array[$value_->varity_id][$value_->feature_id]["promedio"] = $value_->PROMEDIO;
+                        $varity_list[] = $value_->varity_id;
+                    }
+                }
+            }else{
+
+                #FILTRO POR BLOQUE
+                if($request->block != null){
+                    $varities = Varity::whereHas('blocksvarity', function (Builder $query) use($request) {
+                                    $query->whereBlock_id($request->block);
+                                })->whereHas('characteristics', function (Builder $query) use($key,$min,$max, $value, $request) {
+
+                                    if($max > 0){
+                                        $query->where("feature_id", $key)
+                                            ->whereBetween("value",[$min, $max]);
+                                    }else{
+                                        if(is_numeric($min)){
+                                            $query->where("feature_id", $key)->where("value", "!=", 0)->where("value",  $request->operator[$key],(int)$min);
+                                        }else{
+                                            if($min != null){
+                                                $min = str_replace("'", "", $min);
+                                                $query->where("feature_id", $key)->where("value",'like',$min);
+                                                if($max != null){
+                                                    $query->orwhere("value",'like',$max);
+                                                }
+                                            }else{
+                                                $query->where("feature_id", $key)->where("value", $request->operator[$key], 0);   
+                                            }
+                                        } 
+                                    }
+                                })->with('characteristics');
+
+                }else{
+
+                    if($max > 0 && $max != $min){
+                        $varities = Avg_characteristic::where("feature_id", $key)->whereBetween("PROMEDIO",[$min, $max]);
+
+                    }else{
+
+                        #VALOR UNICO CON OPERADOR LOGICO
+                        if(isset($request->operator[$key])){
+                            if($min > 0){
+                                $varities = Avg_characteristic::where("feature_id", $key)
+                                         ->where("PROMEDIO", $request->operator[$key],(int)$min);
+                            }else{
+                                $varities = Avg_characteristic::where("feature_id", $key)->where("PROMEDIO", $request->operator[$key], 0);
+                            }
+                        }else{
+                            #VALOR UNICO NUMERICO
+                            if(is_numeric($min)){
+                                $varities = Avg_characteristic::where("feature_id", $key)
+                                             ->where("PROMEDIO",(int)$min);
+                            }
+
+                            # STRING
+                            if(is_string($min)){
+                                $min = str_replace("'", "", $min);
+                                $max = str_replace("'", "", $max);
+
+                                $varities = Avg_characteristic::where("feature_id", $key)->where("PROMEDIO",'like',$min);
+
+                                if($max != null  and  $max != $min){
+                                    $varities->orWhere("PROMEDIO",'like',$max);
+                                }
+                            }
+                        }
+                    }
+
+                    $varities = $varities->get();
+
+                    foreach ($varities as $key_ => $value_) {
+                        $varity_array[$value_->varity_id][$value_->feature_id]["promedio"] = $value_->PROMEDIO;
+                        $varity_list[] = $value_->varity_id;
+                    }
+                }
+            }
+        }
+
+        $varities = $varity_list;
+        $varity_data = $varity_array;
+        $config_features = $keys_;
+        $fries = $request->fries;
+
+        return View('crossings.searchHome',compact('varities','varity_data','config_features','fries'));
+    }
+
+    public function uploadPhoto(Request $request){
+
+        $ext = explode('.', $request->file->getClientOriginalName());
+        $ext = end($ext);
+
+        if(!in_array($ext, array('jpg','jpeg','png'))){
+            return redirect('varities/'.$request->input('varity'))->with('alert','Debe agregar sólo imágenes con formato: jpg o png.'); 
+        }
+
+        if($_FILES['file']['type'] == "image/jpeg"){
+            $ext = "jpg";
+        }else if($_FILES['file']['type'] == "image/png"){
+            $ext = "png";
+        }else{
+            return redirect('varities/'.$request->input('varity'))->with('alert','La imagen que estás tratando de subir, tiene problemas con el formato de imagen.');
+        }
+
+        $image = Image::make($request->file('file'));
+
+        // upload and resize using Intervention Image 
+        $filename = 'multimedias/foto-'.$request->input('varity')."_".time().'.'.$ext;
+
+        $image->resize(800, null, function ($constraint) {
+                $constraint->aspectRatio();
+            })
+        ->save($filename, 80);    
+        
+        if($image){
+            $request->merge([
+                'link' => $filename,
+                'varity_id' => $request->input('varity')
+            ]);
+
+            $multimedia = Multimedia::create($request->all());
+        }
+
+        if(!empty($multimedia)){
+            return redirect('varities/'.$request->input('varity'))->with('success','Foto agregada correctamente.');
+        }
+    }
+
+    function stats_standard_deviation( $a, $sample = false) {
+        $n = count($a);
+        if ($n === 0) {
+            trigger_error("The array has zero elements", E_USER_WARNING);
+            return false;
+        }
+        if ($sample && $n === 1) {
+            trigger_error("The array has only 1 element", E_USER_WARNING);
+            return false;
+        }
+        
+        $mean = $a->sum('value') / $n;
+
+        $carry = 0.0;
+
+        foreach ($a as $val) {
+            $d = ((double) $val->value) - $mean;
+            $carry += $d * $d;
+        };
+        if ($sample) {
+           --$n;
+        }
+        return round(sqrt($carry / $n), 2);
+    }
+
+    
+}

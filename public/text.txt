@@ -1,0 +1,813 @@
+Players Rio Ave (dor1an)
+FC Porto (JKey)
+15/02/2025 18:30 res 1 - 3 | FT | 6.11 | 2 - 3
+Players Sporting (GianniKid)
+Benfica (R0ge)
+15/02/2025 18:30 res 3 - 3 | FT | 4.81 | 2 - 1
+Players Benfica (R0ge)
+Rio Ave (dor1an)
+15/02/2025 18:42 res 1 - 2 | FT | 4.53 | 2 - 3
+Players FC Porto (JKey)
+Braga (RuBIX)
+15/02/2025 18:42 res 1 - 2 | FT | 6.76 | 2 - 3
+Players Braga (RuBIX)
+Benfica (R0ge)
+15/02/2025 18:54 res 0 - 3 | FT | 5.18 | 3 - 1
+Players Rio Ave (dor1an)
+Sporting (GianniKid)
+15/02/2025 18:54 res 1 - 5 | FT | 5.64 | 2 - 3
+Players Sporting (GianniKid)
+Braga (RuBIX)
+15/02/2025 19:06 res 3 - 3 | FT | 6.29 | 2 - 3
+Players Benfica (R0ge)
+FC Porto (JKey)
+15/02/2025 19:06 res 2 - 2 | FT | 5.28 | 1 - 2
+Players FC Porto (JKey)
+Sporting (GianniKid)
+15/02/2025 19:18 res 2 - 1 | FT | 6.39 | 2 - 3
+Players Braga (RuBIX)
+Rio Ave (dor1an)
+15/02/2025 19:18 res 5 - 3 | FT | 6.02 | 4 - 3
+Players Benfica (R0ge)
+Sporting (GianniKid)
+15/02/2025 19:30 res 1 - 3 | FT | 4.81 | 1 - 2
+Players Ukraine (dor1an)
+Ghana (JKey)
+15/02/2025 20:40 res 4 - 3 | FT | 6.11 | 2 - 3
+Players Czechia (GianniKid)
+USA (R0ge)
+15/02/2025 20:40 res 0 - 3 | FT | 4.81 | 2 - 1
+Players Ghana (JKey)
+Denmark (RuBIX)
+15/02/2025 20:52 res 2 - 4 | FT | 6.76 | 2 - 3
+Players USA (R0ge)
+Ukraine (dor1an)
+15/02/2025 20:52 res 1 - 1 | FT | 4.53 | 2 - 3
+Players Denmark (RuBIX)
+USA (R0ge)
+15/02/2025 21:04 res 3 - 2 | FT | 5.18 | 3 - 1
+Players Ukraine (dor1an)
+Czechia (GianniKid)
+15/02/2025 21:04 res 3 - 3 | FT | 5.64 | 2 - 3
+Players Czechia (GianniKid)
+Denmark (RuBIX)
+15/02/2025 21:16 res 5 - 2 | FT | 6.29 | 2 - 3
+Players USA (R0ge)
+Ghana (JKey)
+15/02/2025 21:16 res 4 - 2 | FT | 5.28 | 1 - 2
+Players Ghana (JKey)
+Czechia (GianniKid)
+15/02/2025 21:28 res 3 - 4 | FT | 6.39 | 2 - 3
+Players Denmark (RuBIX)
+Ukraine (dor1an)
+15/02/2025 21:28 res 7 - 3 | FT | 6.02 | 4 - 3
+Players Ghana (JKey)
+Ukraine (dor1an)
+15/02/2025 21:40 res 6 - 1 | FT | 6.11 | 3 - 4
+Players USA (R0ge)
+Czechia (GianniKid)
+15/02/2025 21:40 res 1 - 4 | FT | 4.81 | 1 - 2
+Players Ukraine (dor1an)
+USA (R0ge)
+15/02/2025 21:52 res 3 - 0 | FT | 4.53 | 2 - 1
+Players Denmark (RuBIX)
+Ghana (JKey)
+15/02/2025 21:52 res 5 - 1 | FT | 6.76 | 4 - 2
+Players Czechia (GianniKid)
+Ukraine (dor1an)
+15/02/2025 22:04 res 4 - 1 | FT | 5.64 | 3 - 2
+Players USA (R0ge)
+Denmark (RuBIX)
+15/02/2025 22:04 res 2 - 5 | FT | 5.18 | 1 - 2
+Players Denmark (RuBIX)
+Czechia (GianniKid)
+15/02/2025 22:16 res 2 - 2 | FT | 6.29 | 3 - 2
+Players Ghana (JKey)
+USA (R0ge)
+15/02/2025 22:16 res 2 - 2 | FT | 5.28 | 2 - 1
+Players Czechia (GianniKid)
+Ghana (JKey)
+15/02/2025 22:28 res 4 - 3 | FT | 6.39 | 3 - 2
+Players Ukraine (dor1an)
+Denmark (RuBIX)
+15/02/2025 22:28 res 4 - 5 | FT | 6.02 | 2 - 3
+Players Man City (dor1an)
+PSG (JKey)
+15/02/2025 23:00 res 1 - 1 | FT | 6.11 | 2 - 3
+Players Bayern (GianniKid)
+Real Madrid (R0ge)
+15/02/2025 23:00 res 3 - 1 | FT | 4.81 | 2 - 1
+Players Real Madrid (R0ge)
+Man City (dor1an)
+15/02/2025 23:12 res 2 - 1 | FT | 4.53 | 2 - 3
+Players PSG (JKey)
+Liverpool (RuBIX)
+15/02/2025 23:12 res 3 - 3 | FT | 6.76 | 2 - 3
+Players Liverpool (RuBIX)
+Real Madrid (R0ge)
+15/02/2025 23:24 res 3 - 0 | FT | 5.18 | 3 - 1
+Players Man City (dor1an)
+Bayern (GianniKid)
+15/02/2025 23:24 res 4 - 4 | FT | 5.64 | 2 - 3
+Players Bayern (GianniKid)
+Liverpool (RuBIX)
+15/02/2025 23:36 res 5 - 3 | FT | 6.29 | 2 - 3
+Players Real Madrid (R0ge)
+PSG (JKey)
+15/02/2025 23:36 res 3 - 2 | FT | 5.28 | 1 - 2
+Players PSG (JKey)
+Bayern (GianniKid)
+15/02/2025 23:48 res 2 - 5 | FT | 6.39 | 2 - 3
+Players Liverpool (RuBIX)
+Man City (dor1an)
+15/02/2025 23:48 res 6 - 3 | FT | 6.02 | 4 - 3
+Players PSG (JKey)
+Man City (dor1an)
+16/02/2025 0:00 res 1 - 3 | FT | 6.11 | 3 - 4
+Players Real Madrid (R0ge)
+Bayern (GianniKid)
+16/02/2025 0:00 res 1 - 4 | FT | 4.81 | 1 - 2
+Players Bayern (GianniKid)
+PSG (JKey)
+16/02/2025 0:48 res 5 - 5 | FT | 6.39 | 3 - 2
+Players Man City (dor1an)
+Liverpool (RuBIX)
+16/02/2025 0:48 res 4 - 3 | FT | 6.02 | 2 - 3
+Players Man Utd (dor1an)
+Liverpool (JKey)
+16/02/2025 1:10 res 7 - 6 | FT | 6.11 | 2 - 3
+Players Man City (GianniKid)
+Arsenal (R0ge)
+16/02/2025 1:10 res 1 - 4 | FT | 4.81 | 2 - 1
+Players Arsenal (R0ge)
+Man Utd (dor1an)
+16/02/2025 1:22 res 4 - 2 | FT | 4.53 | 2 - 3
+Players Liverpool (JKey)
+Chelsea (RuBIX)
+16/02/2025 1:22 res 0 - 3 | FT | 6.76 | 2 - 3
+Players Chelsea (RuBIX)
+Arsenal (R0ge)
+16/02/2025 1:34 res 6 - 0 | FT | 5.18 | 3 - 1
+Players Man Utd (dor1an)
+Man City (GianniKid)
+16/02/2025 1:34 res 2 - 3 | FT | 5.64 | 2 - 3
+Players Man City (GianniKid)
+Chelsea (RuBIX)
+16/02/2025 1:46 res 2 - 5 | FT | 6.29 | 2 - 3
+Players Arsenal (R0ge)
+Liverpool (JKey)
+16/02/2025 1:46 res 6 - 4 | FT | 5.28 | 1 - 2
+Players Liverpool (JKey)
+Man City (GianniKid)
+16/02/2025 1:58 res 3 - 5 | FT | 6.39 | 2 - 3
+Players Chelsea (RuBIX)
+Man Utd (dor1an)
+16/02/2025 1:58 res 3 - 2 | FT | 6.02 | 4 - 3
+Players Liverpool (JKey)
+Man Utd (dor1an)
+16/02/2025 2:10 res 1 - 1 | FT | 6.11 | 3 - 4
+Players Arsenal (R0ge)
+Man City (GianniKid)
+16/02/2025 2:10 res 2 - 2 | FT | 4.81 | 1 - 2
+Players Man Utd (dor1an)
+Arsenal (R0ge)
+16/02/2025 2:22 res 1 - 3 | FT | 4.53 | 2 - 1
+Players Chelsea (RuBIX)
+Liverpool (JKey)
+16/02/2025 2:22 res 7 - 1 | FT | 6.76 | 4 - 2
+Players Arsenal (R0ge)
+Chelsea (RuBIX)
+16/02/2025 2:34 res 3 - 1 | FT | 5.18 | 1 - 2
+Players Man City (GianniKid)
+Man Utd (dor1an)
+16/02/2025 2:34 res 4 - 3 | FT | 5.64 | 3 - 2
+Players Chelsea (RuBIX)
+Man City (GianniKid)
+16/02/2025 2:46 res 3 - 6 | FT | 6.29 | 3 - 2
+Players Liverpool (JKey)
+Arsenal (R0ge)
+16/02/2025 2:46 res 0 - 2 | FT | 5.28 | 2 - 1
+Players Man City (GianniKid)
+Liverpool (JKey)
+16/02/2025 2:58 res 6 - 3 | FT | 6.39 | 3 - 2
+Players Man Utd (dor1an)
+Chelsea (RuBIX)
+16/02/2025 2:58 res 1 - 3 | FT | 6.02 | 2 - 3
+Players A.Madrid (cl1vlind)
+Barcelona (Senior)
+16/02/2025 3:20 res 2 - 2 | FT | 4.36 | 1 - 2
+Players A.Bilbao (lion)
+Real Madrid (Kravatskhelia)
+16/02/2025 3:20 res 3 - 2 | FT | 5.18 | 3 - 2
+Players Real Madrid (Kravatskhelia)
+A.Madrid (cl1vlind)
+16/02/2025 3:32 res 1 - 1 | FT | 4.91 | 2 - 3
+Players Barcelona (Senior)
+Girona (nikkitta)
+16/02/2025 3:32 res 0 - 0 | FT | 5.01 | 2 - 2
+Players Girona (nikkitta)
+Real Madrid (Kravatskhelia)
+16/02/2025 3:44 res 1 - 4 | FT | 5.56 | 3 - 2
+Players A.Madrid (cl1vlind)
+A.Bilbao (lion)
+16/02/2025 3:44 res 3 - 3 | FT | 4.17 | 2 - 3
+Players A.Bilbao (lion)
+Girona (nikkitta)
+16/02/2025 3:56 res 4 - 5 | FT | 4.82 | 2 - 2
+Players Real Madrid (Kravatskhelia)
+Barcelona (Senior)
+16/02/2025 3:56 res 2 - 2 | FT | 5.37 | 1 - 3
+Players Barcelona (Senior)
+A.Bilbao (lion)
+16/02/2025 4:08 res 2 - 2 | FT | 4.63 | 2 - 3
+Players Girona (nikkitta)
+A.Madrid (cl1vlind)
+16/02/2025 4:08 res 1 - 1 | FT | 4.54 | 2 - 1
+Players Barcelona (Senior)
+A.Madrid (cl1vlind)
+16/02/2025 4:20 res 2 - 3 | FT | 4.36 | 3 - 2
+Players Real Madrid (Kravatskhelia)
+A.Bilbao (lion)
+16/02/2025 4:20 res 7 - 1 | FT | 5.18 | 2 - 3
+Players A.Madrid (cl1vlind)
+Real Madrid (Kravatskhelia)
+16/02/2025 4:32 res 2 - 4 | FT | 4.91 | 2 - 3
+Players Girona (nikkitta)
+Barcelona (Senior)
+16/02/2025 4:32 res 3 - 1 | FT | 5.01 | 2 - 2
+Players Real Madrid (Kravatskhelia)
+Girona (nikkitta)
+16/02/2025 4:44 res 2 - 1 | FT | 5.56 | 2 - 3
+Players A.Bilbao (lion)
+A.Madrid (cl1vlind)
+16/02/2025 4:44 res 5 - 2 | FT | 4.17 | 3 - 2
+Players Girona (nikkitta)
+A.Bilbao (lion)
+16/02/2025 4:56 res 3 - 2 | FT | 4.82 | 2 - 2
+Players Barcelona (Senior)
+Real Madrid (Kravatskhelia)
+16/02/2025 4:56 res 4 - 1 | FT | 5.37 | 3 - 2
+Players A.Bilbao (lion)
+Barcelona (Senior)
+16/02/2025 5:08 res 2 - 1 | FT | 4.63 | 3 - 2
+Players A.Madrid (cl1vlind)
+Girona (nikkitta)
+16/02/2025 5:08 res 3 - 2 | FT | 4.54 | 1 - 2
+Players Pohang Steelers (cl1vlind)
+Al Hilal (Senior)
+16/02/2025 5:30 res 4 - 4 | FT | 4.36 | 1 - 2
+Players Gangwon FC (lion)
+Al Ain FC (Kravatskhelia)
+16/02/2025 5:30 res 5 - 1 | FT | 5.18 | 3 - 2
+Players Al Ain FC (Kravatskhelia)
+Pohang Steelers (cl1vlind)
+16/02/2025 5:42 res 4 - 4 | FT | 4.91 | 2 - 3
+Players Al Hilal (Senior)
+Al Nassr (nikkitta)
+16/02/2025 5:42 res 1 - 1 | FT | 5.01 | 2 - 2
+Players Al Nassr (nikkitta)
+Al Ain FC (Kravatskhelia)
+16/02/2025 5:54 res 1 - 5 | FT | 5.56 | 3 - 2
+Players Pohang Steelers (cl1vlind)
+Gangwon FC (lion)
+16/02/2025 5:54 res 1 - 3 | FT | 4.17 | 2 - 3
+Players Gangwon FC (lion)
+Al Nassr (nikkitta)
+16/02/2025 6:06 res 3 - 1 | FT | 4.82 | 2 - 2
+Players Al Ain FC (Kravatskhelia)
+Al Hilal (Senior)
+16/02/2025 6:06 res 2 - 2 | FT | 5.37 | 1 - 3
+Players Al Hilal (Senior)
+Gangwon FC (lion)
+16/02/2025 6:18 res 4 - 1 | FT | 4.63 | 2 - 3
+Players Al Nassr (nikkitta)
+Pohang Steelers (cl1vlind)
+16/02/2025 6:18 res 1 - 2 | FT | 4.54 | 2 - 1
+Players Al Hilal (Senior)
+Pohang Steelers (cl1vlind)
+16/02/2025 6:30 res 4 - 5 | FT | 4.36 | 3 - 2
+Players Al Ain FC (Kravatskhelia)
+Gangwon FC (lion)
+16/02/2025 6:30 res 2 - 1 | FT | 5.18 | 2 - 3
+Players Al Nassr (nikkitta)
+Al Hilal (Senior)
+16/02/2025 6:42 res 3 - 1 | FT | 5.01 | 2 - 2
+Players Pohang Steelers (cl1vlind)
+Al Ain FC (Kravatskhelia)
+16/02/2025 6:42 res 4 - 1 | FT | 4.91 | 2 - 3
+Players Al Ain FC (Kravatskhelia)
+Al Nassr (nikkitta)
+16/02/2025 6:54 res 2 - 2 | FT | 5.56 | 2 - 3
+Players Gangwon FC (lion)
+Pohang Steelers (cl1vlind)
+16/02/2025 6:54 res 0 - 2 | FT | 4.17 | 3 - 2
+Players Al Hilal (Senior)
+Al Ain FC (Kravatskhelia)
+16/02/2025 7:06 res 3 - 1 | FT | 5.37 | 3 - 2
+Players Al Nassr (nikkitta)
+Gangwon FC (lion)
+16/02/2025 7:06 res 4 - 4 | FT | 4.82 | 2 - 2
+Players Pohang Steelers (cl1vlind)
+Al Nassr (nikkitta)
+16/02/2025 7:18 res 2 - 6 | FT | 4.54 | 1 - 2
+Players Man City (lion)
+PSG (Kravatskhelia)
+16/02/2025 7:50 res 4 - 4 | FT | 5.18 | 3 - 2
+Players River Plate (cl1vlind)
+Real Madrid (Senior)
+16/02/2025 7:50 res 1 - 4 | FT | 4.36 | 1 - 2
+Players PSG (Kravatskhelia)
+River Plate (cl1vlind)
+16/02/2025 8:02 res 6 - 5 | FT | 4.91 | 2 - 3
+Players Real Madrid (Senior)
+Boca Juniors (nikkitta)
+16/02/2025 8:02 res 0 - 0 | FT | 5.01 | 2 - 2
+Players Boca Juniors (nikkitta)
+PSG (Kravatskhelia)
+16/02/2025 8:14 res 1 - 2 | FT | 5.56 | 3 - 2
+Players River Plate (cl1vlind)
+Man City (lion)
+16/02/2025 8:14 res 2 - 5 | FT | 4.17 | 2 - 3
+Players Man City (lion)
+Boca Juniors (nikkitta)
+16/02/2025 8:26 res 3 - 3 | FT | 4.82 | 2 - 2
+Players PSG (Kravatskhelia)
+Real Madrid (Senior)
+16/02/2025 8:26 res 2 - 1 | FT | 5.37 | 1 - 3
+Players Boca Juniors (nikkitta)
+River Plate (cl1vlind)
+16/02/2025 8:38 res 3 - 2 | FT | 4.54 | 2 - 1
+Players Real Madrid (Senior)
+Man City (lion)
+16/02/2025 8:38 res 3 - 0 | FT | 4.63 | 2 - 3
+Players Real Madrid (Senior)
+River Plate (cl1vlind)
+16/02/2025 8:50 res 2 - 1 | FT | 4.36 | 3 - 2
+Players PSG (Kravatskhelia)
+Man City (lion)
+16/02/2025 8:50 res 1 - 5 | FT | 5.18 | 2 - 3
+Players River Plate (cl1vlind)
+PSG (Kravatskhelia)
+16/02/2025 9:02 res 2 - 4 | FT | 4.91 | 2 - 3
+Players Boca Juniors (nikkitta)
+Real Madrid (Senior)
+16/02/2025 9:02 res 0 - 2 | FT | 5.01 | 2 - 2
+Players PSG (Kravatskhelia)
+Boca Juniors (nikkitta)
+16/02/2025 9:14 res 1 - 1 | FT | 5.56 | 2 - 3
+Players Man City (lion)
+River Plate (cl1vlind)
+16/02/2025 9:14 res 5 - 6 | FT | 4.17 | 3 - 2
+Players Boca Juniors (nikkitta)
+Man City (lion)
+16/02/2025 9:26 res 3 - 1 | FT | 4.82 | 2 - 2
+Players Real Madrid (Senior)
+PSG (Kravatskhelia)
+16/02/2025 9:26 res 2 - 3 | FT | 5.37 | 3 - 2
+Players Man City (lion)
+Real Madrid (Senior)
+16/02/2025 9:38 res 4 - 2 | FT | 4.63 | 3 - 2
+Players River Plate (cl1vlind)
+Boca Juniors (nikkitta)
+16/02/2025 9:38 res 0 - 1 | FT | 4.54 | 1 - 2
+Players Eintracht (cl1vlind)
+Roma (Senior)
+16/02/2025 10:00 res 3 - 1 | FT | 4.36 | 1 - 2
+Players FC Porto (lion)
+Tottenham (Kravatskhelia)
+16/02/2025 10:00 res 4 - 2 | FT | 5.18 | 3 - 2
+Players Tottenham (Kravatskhelia)
+Eintracht (cl1vlind)
+16/02/2025 10:12 res 2 - 3 | FT | 4.91 | 2 - 3
+Players Roma (Senior)
+Fenerbahce (nikkitta)
+16/02/2025 10:12 res 1 - 0 | FT | 5.01 | 2 - 2
+Players Eintracht (cl1vlind)
+FC Porto (lion)
+16/02/2025 10:24 res 4 - 6 | FT | 4.17 | 2 - 3
+Players Fenerbahce (nikkitta)
+Tottenham (Kravatskhelia)
+16/02/2025 10:24 res 1 - 2 | FT | 5.56 | 3 - 2
+Players FC Porto (lion)
+Fenerbahce (nikkitta)
+16/02/2025 10:36 res 1 - 4 | FT | 4.82 | 2 - 2
+Players Tottenham (Kravatskhelia)
+Roma (Senior)
+16/02/2025 10:36 res 3 - 4 | FT | 5.37 | 1 - 3
+Players Roma (Senior)
+FC Porto (lion)
+16/02/2025 10:48 res 1 - 3 | FT | 4.63 | 2 - 3
+Players Fenerbahce (nikkitta)
+Eintracht (cl1vlind)
+16/02/2025 10:48 res 5 - 5 | FT | 4.54 | 2 - 1
+Players Roma (Senior)
+Eintracht (cl1vlind)
+16/02/2025 11:00 res 3 - 4 | FT | 4.36 | 3 - 2
+Players Tottenham (Kravatskhelia)
+FC Porto (lion)
+16/02/2025 11:00 res 4 - 2 | FT | 5.18 | 2 - 3
+Players Eintracht (cl1vlind)
+Tottenham (Kravatskhelia)
+16/02/2025 11:12 res 5 - 4 | FT | 4.91 | 2 - 3
+Players Fenerbahce (nikkitta)
+Roma (Senior)
+16/02/2025 11:12 res 3 - 1 | FT | 5.01 | 2 - 2
+Players Tottenham (Kravatskhelia)
+Fenerbahce (nikkitta)
+16/02/2025 11:24 res 2 - 1 | FT | 5.56 | 2 - 3
+Players FC Porto (lion)
+Eintracht (cl1vlind)
+16/02/2025 11:24 res 4 - 1 | FT | 4.17 | 3 - 2
+Players Fenerbahce (nikkitta)
+FC Porto (lion)
+16/02/2025 11:36 res 3 - 7 | FT | 4.82 | 2 - 2
+Players Roma (Senior)
+Tottenham (Kravatskhelia)
+16/02/2025 11:36 res 4 - 4 | FT | 5.37 | 3 - 2
+Players Boca Juniors (Bolec)
+Real Madrid (Maslja)
+16/02/2025 11:40 res 0 - 2 | FT | 4.07 | 2 - 3
+Players FC Porto (lion)
+Roma (Senior)
+16/02/2025 11:48 res 2 - 4 | FT | 4.63 | 3 - 2
+Players Eintracht (cl1vlind)
+Fenerbahce (nikkitta)
+16/02/2025 11:48 res 2 - 3 | FT | 4.54 | 1 - 2
+Players Man City (Hyper)
+PSG (Peconi)
+16/02/2025 11:52 res 5 - 1 | FT | 5.09 | 3 - 2
+Players Real Madrid (Maslja)
+River Plate (Boki)
+16/02/2025 11:52 res 3 - 1 | FT | 3.98 | 1 - 2
+Players PSG (Peconi)
+Real Madrid (Maslja)
+16/02/2025 12:04 res 1 - 2 | FT | 4.35 | 1 - 2
+Players River Plate (Boki)
+Boca Juniors (Bolec)
+16/02/2025 12:04 res 1 - 4 | FT | 4.17 | 2 - 1
+Players Boca Juniors (Bolec)
+PSG (Peconi)
+16/02/2025 12:16 res 3 - 3 | FT | 4.53 | 2 - 3
+Players Real Madrid (Maslja)
+Man City (Hyper)
+16/02/2025 12:16 res 1 - 3 | FT | 4.63 | 2 - 3
+Players Man City (Hyper)
+Boca Juniors (Bolec)
+16/02/2025 12:28 res 1 - 3 | FT | 4.82 | 3 - 2
+Players PSG (Peconi)
+River Plate (Boki)
+16/02/2025 12:28 res 1 - 3 | FT | 4.44 | 1 - 2
+Players River Plate (Boki)
+Real Madrid (Maslja)
+16/02/2025 12:52 res 3 - 1 | FT | 3.98 | 2 - 1
+Players PSG (Peconi)
+Man City (Hyper)
+16/02/2025 12:52 res 2 - 2 | FT | 5.09 | 2 - 3
+Players Boca Juniors (Bolec)
+River Plate (Boki)
+16/02/2025 13:04 res 1 - 2 | FT | 4.17 | 1 - 2
+Players PSG (Peconi)
+Boca Juniors (Bolec)
+16/02/2025 13:16 res 1 - 4 | FT | 4.53 | 3 - 2
+Players Man City (Hyper)
+Real Madrid (Maslja)
+16/02/2025 13:16 res 2 - 4 | FT | 4.63 | 1 - 2
+Players Boca Juniors (Bolec)
+Man City (Hyper)
+16/02/2025 13:28 res 0 - 1 | FT | 4.82 | 2 - 3
+Players River Plate (Boki)
+PSG (Peconi)
+16/02/2025 13:28 res 2 - 0 | FT | 4.44 | 2 - 1
+Players Fenerbahce (Bolec)
+Tottenham (Maslja)
+16/02/2025 13:50 res 0 - 2 | FT | 4.07 | 2 - 3
+Players Eintracht (Boki)
+Fenerbahce (Bolec)
+16/02/2025 14:14 res 1 - 4 | FT | 4.17 | 2 - 1
+Players Roma (Peconi)
+Tottenham (Maslja)
+16/02/2025 14:14 res 0 - 4 | FT | 4.35 | 1 - 2
+Players Fenerbahce (Bolec)
+Roma (Peconi)
+16/02/2025 14:26 res 1 - 1 | FT | 4.53 | 2 - 3
+Players Tottenham (Maslja)
+FC Porto (Hyper)
+16/02/2025 14:26 res 1 - 1 | FT | 4.63 | 2 - 3
+Players FC Porto (Hyper)
+Fenerbahce (Bolec)
+16/02/2025 14:38 res 1 - 1 | FT | 4.82 | 3 - 2
+Players Roma (Peconi)
+Eintracht (Boki)
+16/02/2025 14:38 res 1 - 2 | FT | 4.44 | 1 - 2
+Players FC Porto (Hyper)
+Eintracht (Boki)
+16/02/2025 14:50 res 1 - 2 | FT | 4.73 | 3 - 2
+Players Tottenham (Maslja)
+Fenerbahce (Bolec)
+16/02/2025 14:50 res 2 - 1 | FT | 4.07 | 3 - 2
+Players Eintracht (Boki)
+Tottenham (Maslja)
+16/02/2025 15:02 res 1 - 1 | FT | 3.98 | 2 - 1
+Players Roma (Peconi)
+FC Porto (Hyper)
+16/02/2025 15:02 res 3 - 2 | FT | 5.09 | 2 - 3
+Players Fenerbahce (Bolec)
+Eintracht (Boki)
+16/02/2025 15:14 res 2 - 1 | FT | 4.17 | 1 - 2
+Players Tottenham (Maslja)
+Roma (Peconi)
+16/02/2025 15:14 res 2 - 2 | FT | 4.35 | 2 - 1
+Players Chelsea (Boki)
+Man Utd (Hyper)
+16/02/2025 16:10 res 1 - 2 | FT | 4.73 | 2 - 3
+Players Liverpool (Bolec)
+Man City (Maslja)
+16/02/2025 16:10 res 2 - 2 | FT | 4.07 | 2 - 3
+Players Man City (Maslja)
+Chelsea (Boki)
+16/02/2025 16:22 res 1 - 3 | FT | 3.98 | 1 - 2
+Players Man Utd (Hyper)
+Arsenal (Peconi)
+16/02/2025 16:22 res 3 - 3 | FT | 5.09 | 3 - 2
+Players Arsenal (Peconi)
+Man City (Maslja)
+16/02/2025 16:34 res 2 - 4 | FT | 4.35 | 1 - 2
+Players Chelsea (Boki)
+Liverpool (Bolec)
+16/02/2025 16:34 res 4 - 3 | FT | 4.17 | 2 - 1
+Players Liverpool (Bolec)
+Arsenal (Peconi)
+16/02/2025 16:46 res 2 - 1 | FT | 4.53 | 2 - 3
+Players Man City (Maslja)
+Man Utd (Hyper)
+16/02/2025 16:46 res 4 - 2 | FT | 4.63 | 2 - 3
+Players Man Utd (Hyper)
+Liverpool (Bolec)
+16/02/2025 16:58 res 3 - 2 | FT | 4.82 | 3 - 2
+Players Arsenal (Peconi)
+Chelsea (Boki)
+16/02/2025 16:58 res 1 - 4 | FT | 4.44 | 1 - 2
+Players Man Utd (Hyper)
+Chelsea (Boki)
+16/02/2025 17:10 res 2 - 4 | FT | 4.73 | 3 - 2
+Players Man City (Maslja)
+Liverpool (Bolec)
+16/02/2025 17:10 res 4 - 3 | FT | 4.07 | 3 - 2
+Players Chelsea (Boki)
+Man City (Maslja)
+16/02/2025 17:22 res 3 - 2 | FT | 3.98 | 2 - 1
+Players Arsenal (Peconi)
+Man Utd (Hyper)
+16/02/2025 17:22 res 3 - 4 | FT | 5.09 | 2 - 3
+Players Arsenal (Peconi)
+Liverpool (Bolec)
+16/02/2025 17:46 res 2 - 1 | FT | 4.53 | 3 - 2
+Players Man Utd (Hyper)
+Man City (Maslja)
+16/02/2025 17:46 res 2 - 2 | FT | 4.63 | 1 - 2
+Players Liverpool (Bolec)
+Man Utd (Hyper)
+16/02/2025 17:58 res 2 - 4 | FT | 4.82 | 2 - 3
+Players Chelsea (Boki)
+Arsenal (Peconi)
+16/02/2025 17:58 res 3 - 3 | FT | 4.44 | 2 - 1
+Players France (GanGsta_Panda)
+Italy (exhausted)
+17/02/2025 18:20 res 6 - 3 | FT | 5.10 | 1 - 2
+Players Germany (vivienne)
+Argentina (why)
+17/02/2025 18:20 res 4 - 2 | FT | 5.74 | 2 - 3
+Players FC Porto (hotShot)
+Sporting (Kodak)
+17/02/2025 18:30 res 3 - 3 | FT | 3.71 | 2 - 2
+Players Braga (Inquisitor)
+Rio Ave (Boulevard)
+17/02/2025 18:30 res 3 - 3 | FT | 3.61 | 1 - 2
+Players Germany (vivienne)
+France (GanGsta_Panda)
+17/02/2025 18:32 res 2 - 5 | FT | 4.91 | 3 - 2
+Players Argentina (why)
+Italy (exhausted)
+17/02/2025 18:32 res 0 - 3 | FT | 5.93 | 3 - 2
+Players Rio Ave (Boulevard)
+FC Porto (hotShot)
+17/02/2025 18:42 res 3 - 5 | FT | 3.98 | 2 - 2
+Players Sporting (Kodak)
+Benfica (Kray)
+17/02/2025 18:42 res 1 - 3 | FT | 3.79 | 1 - 2
+Players Italy (exhausted)
+Germany (vivienne)
+17/02/2025 18:44 res 4 - 2 | FT | 5.74 | 2 - 3
+Players Argentina (why)
+France (GanGsta_Panda)
+17/02/2025 18:44 res 1 - 2 | FT | 5.09 | 3 - 2
+Players Benfica (Kray)
+Rio Ave (Boulevard)
+17/02/2025 18:54 res 4 - 2 | FT | 4.07 | 2 - 1
+Players FC Porto (hotShot)
+Braga (Inquisitor)
+17/02/2025 18:54 res 1 - 2 | FT | 2.96 | 2 - 2
+Players France (GanGsta_Panda)
+Italy (exhausted)
+17/02/2025 18:56 res 3 - 5 | FT | 5.10 | 1 - 2
+Players Germany (vivienne)
+Argentina (why)
+17/02/2025 18:56 res 2 - 3 | FT | 5.74 | 2 - 3
+Players Braga (Inquisitor)
+Benfica (Kray)
+17/02/2025 19:06 res 1 - 0 | FT | 3.05 | 1 - 2
+Players Rio Ave (Boulevard)
+Sporting (Kodak)
+17/02/2025 19:06 res 2 - 0 | FT | 4.36 | 2 - 3
+Players Sporting (Kodak)
+Braga (Inquisitor)
+17/02/2025 19:18 res 3 - 1 | FT | 3.33 | 2 - 1
+Players Benfica (Kray)
+FC Porto (hotShot)
+17/02/2025 19:18 res 2 - 2 | FT | 3.42 | 2 - 1
+Players Rio Ave (Boulevard)
+Braga (Inquisitor)
+17/02/2025 19:30 res 1 - 0 | FT | 3.61 | 2 - 3
+Players Sporting (Kodak)
+FC Porto (hotShot)
+17/02/2025 19:30 res 1 - 1 | FT | 3.71 | 2 - 2
+Players Italy (exhausted)
+Germany (vivienne)
+17/02/2025 19:32 res 1 - 3 | FT | 5.74 | 2 - 3
+Players Argentina (why)
+France (GanGsta_Panda)
+17/02/2025 19:32 res 2 - 3 | FT | 5.09 | 3 - 2
+Players FC Porto (hotShot)
+Rio Ave (Boulevard)
+17/02/2025 19:42 res 1 - 1 | FT | 3.98 | 2 - 2
+Players Benfica (Kray)
+Sporting (Kodak)
+17/02/2025 19:42 res 3 - 3 | FT | 3.79 | 2 - 1
+Players France (GanGsta_Panda)
+Italy (exhausted)
+17/02/2025 19:44 res 2 - 2 | FT | 5.10 | 1 - 2
+Players Germany (vivienne)
+Argentina (why)
+17/02/2025 19:44 res 2 - 0 | FT | 5.74 | 2 - 3
+Players Rio Ave (Boulevard)
+Benfica (Kray)
+17/02/2025 19:54 res 3 - 1 | FT | 4.07 | 1 - 2
+Players Braga (Inquisitor)
+FC Porto (hotShot)
+17/02/2025 19:54 res 2 - 2 | FT | 2.96 | 2 - 2
+Players Germany (vivienne)
+France (GanGsta_Panda)
+17/02/2025 19:56 res 2 - 4 | FT | 4.91 | 3 - 2
+Players Argentina (why)
+Italy (exhausted)
+17/02/2025 19:56 res 2 - 4 | FT | 5.93 | 3 - 2
+Players Italy (exhausted)
+Germany (vivienne)
+17/02/2025 20:08 res 3 - 1 | FT | 5.74 | 2 - 3
+Players Argentina (why)
+France (GanGsta_Panda)
+17/02/2025 20:08 res 3 - 5 | FT | 5.09 | 3 - 2
+Players Fiorentina (GanGsta_Panda)
+Napoli (exhausted)
+17/02/2025 20:30 res 2 - 2 | FT | 5.10 | 1 - 2
+Players Roma (vivienne)
+Bologna (why)
+17/02/2025 20:30 res 4 - 3 | FT | 5.74 | 2 - 3
+Players Ghana (hotShot)
+Czechia (Kodak)
+17/02/2025 20:40 res 2 - 1 | FT | 3.71 | 2 - 2
+Players Denmark (Inquisitor)
+Ukraine (Boulevard)
+17/02/2025 20:40 res 2 - 1 | FT | 3.61 | 1 - 2
+Players Roma (vivienne)
+Fiorentina (GanGsta_Panda)
+17/02/2025 20:42 res 2 - 4 | FT | 4.91 | 3 - 2
+Players Bologna (why)
+Napoli (exhausted)
+17/02/2025 20:42 res 2 - 5 | FT | 5.93 | 3 - 2
+Players Ukraine (Boulevard)
+Ghana (hotShot)
+17/02/2025 20:52 res 2 - 2 | FT | 3.98 | 2 - 2
+Players Czechia (Kodak)
+USA (Kray)
+17/02/2025 20:52 res 3 - 2 | FT | 3.79 | 1 - 2
+Players Napoli (exhausted)
+Roma (vivienne)
+17/02/2025 20:54 res 4 - 0 | FT | 5.74 | 2 - 3
+Players Bologna (why)
+Fiorentina (GanGsta_Panda)
+17/02/2025 20:54 res 5 - 2 | FT | 5.09 | 3 - 2
+Players USA (Kray)
+Ukraine (Boulevard)
+17/02/2025 21:04 res 3 - 1 | FT | 4.07 | 2 - 1
+Players Ghana (hotShot)
+Denmark (Inquisitor)
+17/02/2025 21:04 res 2 - 0 | FT | 2.96 | 2 - 2
+Players Fiorentina (GanGsta_Panda)
+Napoli (exhausted)
+17/02/2025 21:06 res 3 - 3 | FT | 5.10 | 1 - 2
+Players Roma (vivienne)
+Bologna (why)
+17/02/2025 21:06 res 2 - 4 | FT | 5.74 | 2 - 3
+Players Denmark (Inquisitor)
+USA (Kray)
+17/02/2025 21:16 res 0 - 2 | FT | 3.05 | 1 - 2
+Players Ukraine (Boulevard)
+Czechia (Kodak)
+17/02/2025 21:16 res 2 - 0 | FT | 4.36 | 2 - 3
+Players Czechia (Kodak)
+Denmark (Inquisitor)
+17/02/2025 21:28 res 2 - 1 | FT | 3.33 | 2 - 1
+Players USA (Kray)
+Ghana (hotShot)
+17/02/2025 21:28 res 5 - 2 | FT | 3.42 | 2 - 1
+Players Roma (vivienne)
+Fiorentina (GanGsta_Panda)
+17/02/2025 21:30 res 2 - 2 | FT | 4.91 | 3 - 2
+Players Bologna (why)
+Napoli (exhausted)
+17/02/2025 21:30 res 4 - 1 | FT | 5.93 | 3 - 2
+Players Czechia (Kodak)
+Ghana (hotShot)
+17/02/2025 21:40 res 0 - 2 | FT | 3.71 | 2 - 2
+Players Ukraine (Boulevard)
+Denmark (Inquisitor)
+17/02/2025 21:40 res 3 - 1 | FT | 3.61 | 2 - 3
+Players Napoli (exhausted)
+Roma (vivienne)
+17/02/2025 21:42 res 3 - 4 | FT | 5.74 | 2 - 3
+Players Bologna (why)
+Fiorentina (GanGsta_Panda)
+17/02/2025 21:42 res 3 - 0 | FT | 5.09 | 3 - 2
+Players Ghana (hotShot)
+Ukraine (Boulevard)
+17/02/2025 21:52 res 2 - 2 | FT | 3.98 | 2 - 2
+Players USA (Kray)
+Czechia (Kodak)
+17/02/2025 21:52 res 1 - 4 | FT | 3.79 | 2 - 1
+Players Fiorentina (GanGsta_Panda)
+Napoli (exhausted)
+17/02/2025 21:54 res 3 - 5 | FT | 5.10 | 1 - 2
+Players Roma (vivienne)
+Bologna (why)
+17/02/2025 21:54 res 2 - 3 | FT | 5.74 | 2 - 3
+Players USA (Kray)
+Denmark (Inquisitor)
+17/02/2025 22:16 res 3 - 2 | FT | 3.05 | 2 - 1
+Players Czechia (Kodak)
+Ukraine (Boulevard)
+17/02/2025 22:16 res 2 - 2 | FT | 4.36 | 1 - 2
+Players Napoli (exhausted)
+Roma (vivienne)
+17/02/2025 22:18 res 1 - 0 | FT | 5.74 | 2 - 3
+Players Bologna (why)
+Fiorentina (GanGsta_Panda)
+17/02/2025 22:18 res 2 - 1 | FT | 5.09 | 3 - 2
+Players Denmark (Inquisitor)
+Czechia (Kodak)
+17/02/2025 22:28 res 1 - 4 | FT | 3.33 | 1 - 2
+Players Ghana (hotShot)
+USA (Kray)
+17/02/2025 22:28 res 2 - 2 | FT | 3.42 | 1 - 2
+Players Penarol (GanGsta_Panda)
+Colo Colo (exhausted)
+17/02/2025 22:40 res 2 - 2 | FT | 5.10 | 1 - 2
+Players Bolivar (vivienne)
+River Plate (why)
+17/02/2025 22:40 res 1 - 4 | FT | 5.74 | 2 - 3
+Players Bolivar (vivienne)
+Penarol (GanGsta_Panda)
+17/02/2025 22:52 res 4 - 0 | FT | 4.91 | 3 - 2
+Players River Plate (why)
+Colo Colo (exhausted)
+17/02/2025 22:52 res 2 - 3 | FT | 5.93 | 3 - 2
+Players PSG (hotShot)
+Bayern (Kodak)
+17/02/2025 23:00 res 2 - 2 | FT | 3.71 | 2 - 2
+Players Liverpool (Inquisitor)
+Man City (Boulevard)
+17/02/2025 23:00 res 2 - 3 | FT | 3.61 | 1 - 2
+Players Colo Colo (exhausted)
+Bolivar (vivienne)
+17/02/2025 23:04 res 2 - 4 | FT | 5.74 | 2 - 3
+Players River Plate (why)
+Penarol (GanGsta_Panda)
+17/02/2025 23:04 res 2 - 0 | FT | 5.09 | 3 - 2
+Players Man City (Boulevard)
+PSG (hotShot)
+17/02/2025 23:12 res 2 - 2 | FT | 3.98 | 2 - 2
+Players Bayern (Kodak)
+Real Madrid (Kray)
+17/02/2025 23:12 res 0 - 3 | FT | 3.79 | 1 - 2
+Players Penarol (GanGsta_Panda)
+Colo Colo (exhausted)
+17/02/2025 23:16 res 0 - 1 | FT | 5.10 | 1 - 2
+Players Bolivar (vivienne)
+River Plate (why)
+17/02/2025 23:16 res 4 - 4 | FT | 5.74 | 2 - 3
+Players Real Madrid (Kray)
+Man City (Boulevard)
+17/02/2025 23:24 res 1 - 3 | FT | 4.07 | 2 - 1
+Players PSG (hotShot)
+Liverpool (Inquisitor)
+17/02/2025 23:24 res 0 - 0 | FT | 2.96 | 2 - 2

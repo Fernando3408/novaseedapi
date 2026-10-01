@@ -1,0 +1,258 @@
+<?php
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+
+
+
+use App\Models\Feature;
+
+Route::get('/', 'HomeController@index');
+Route::get('/bets', 'HomeController@bets')->name('bets.show');
+Route::get('/test', 'HomeController@testing')->name('bets.test');
+Route::any('/bets/process_data', 'HomeController@process_data')->name('bets.process_data');
+#Route::get('/bets/show', 'HomeController@bets_show')->name('bets.show');
+Route::get('/import_bets', 'HomeController@import_bets');
+Route::get('/import_manual_bet', 'HomeController@import_manual_bet');
+Route::any('/import_bot_bet', 'HomeController@import_bot_bet');
+Route::get('/import', 'HomeController@import');
+Route::post('/import', 'HomeController@importExcel');
+Route::get('/bets_compare', 'HomeController@bets_compare');
+Route::get('/bets/filterEnemies', 'HomeController@filterEnemies')->name('bets.filterEnemies');
+Route::get('/info_bets', 'HomeController@info_bets')->name('bets.info_bets');
+Route::get('/betshtft', 'HomeController@betshtft')->name('bets.betshtft');
+Route::get('bets/detail', 'HomeController@detail')->name('bets.detail');#shiny_data
+Route::get('bets/shiny_data', 'HomeController@shiny_data')->name('bets.shiny_data');#shiny_data
+Route::get('/process_spreads', 'HomeController@process_spreads')->name('bets.process_spreads');
+Route::get('/players-by-group', 'HomeController@playersByGroups')->name('players.by.groups');
+Route::get('/sync_betsapi', 'HomeController@sync_betsapi');
+Route::get('/bets/summary', 'HomeController@bets_summary');
+Route::post('advisor', 'AdvisorController@evaluar');
+Route::post('/novaseed-ai/chat', 'NovaSeedChatController@chat')->middleware('auth');
+
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
+
+Route::get('/features/add-value', function () {
+	return View('features._add-value',['id' => $_GET['id']]);
+});
+
+Route::get('/features/get-values', function () {
+	$feature = Feature::find($_GET['id']);
+	return View('features._get-values',['feature' => $feature]);
+});
+Route::get('/papelera', 'VarityController@index_papelera')->name('varities.papelera');
+Route::get('/varities/exporData', 'VarityController@check_db');
+Route::get('/delete_final_boss', 'VarityController@delete_final_boss'); #elimina variedades sin hijos, ni datoss
+Route::get('/varities/searchHome', 'VarityController@searchHome');
+Route::get('/varities/searchHomeLegacy', 'VarityController@searchHomeLegacy');
+Route::get('/varities/searchHomeCrossing', 'VarityController@searchHomeCrossing');
+Route::get('/varities/searchHomeFries', 'VarityController@searchHomeFries');
+Route::get('/api/features/catalog', 'ApiController@featuresCatalog');
+Route::get('/api/results/query-guide', 'ApiController@resultsQueryGuide');
+Route::match(['get', 'post'], '/api/results/search', 'ApiController@searchResults');
+Route::middleware('throttle:60,1')->group(function () {
+    Route::get('/api/ia/capabilities', 'IaGatewayController@capabilities');
+    Route::get('/api/ia/catalog', 'IaGatewayController@catalog');
+    Route::get('/api/ia/query-guide', 'IaGatewayController@queryGuide');
+    Route::match(['get', 'post'], '/api/ia/search', 'IaGatewayController@searchResults');
+    Route::get('/api/ia/variety/{identifier}', 'IaGatewayController@varietyProfile');
+    Route::get('/api/ia/lineage/{identifier}', 'IaGatewayController@lineage');
+    Route::get('/api/ia/descendants/{identifier}', 'IaGatewayController@descendants');
+    Route::get('/api/ia/compare', 'IaGatewayController@compare');
+    Route::post('/api/ia/compare', 'IaGatewayController@compare');
+    Route::get('/api/ia/market-standards', 'IaGatewayController@marketStandards');
+    Route::get('/api/ia/relative-yields', 'IaGatewayController@relativeYields');
+    Route::get('/api/ia/greenhouse-status', 'IaGatewayController@greenhouseStatus');
+    Route::get('/api/ia/traceability', 'IaGatewayController@traceability');
+    Route::get('/api/ia/data-quality', 'IaGatewayController@dataQuality');
+});
+Route::get('/varities/addValues', 'VarityController@addValues');
+Route::get('/varities/addFeature', 'VarityController@addFeature');
+Route::get('/blocks/addFeature', 'BlockController@addFeature');
+Route::post('/varities/saveCharacteristics', 'VarityController@saveCharacteristics');
+Route::post('/varities/uploadPhoto', 'VarityController@uploadPhoto');
+Route::get('/varity/check_to_delete', 'VarityController@check_to_delete');
+Route::get('/varities/ancesters/{id}/{maxlevel}/{level}', 'VarityController@ancesters');
+Route::post('/varities/restore/{id}', 'VarityController@restore')->name("varities.restore");
+Route::resource('varities', 'VarityController');
+
+
+Route::get('/crossings/zonashow/{id?}', 'CrossingController@zonashow')->name('crossings.zonashow');
+Route::get('/crossings/zonaedit/{id?}', 'CrossingController@zonaedit')->name('crossings.zonaedit');
+Route::get('/crossings/zonacreate/{id?}', 'CrossingController@zonacreate')->name('crossings.zonacreate');
+Route::post('/crossings/zonacreate', 'CrossingController@zonastore')->name('crossings.zonacreate');
+Route::get('/crossings/mapout', 'CrossingController@mapout');
+Route::get('/crossings/zona', 'CrossingController@zona');
+Route::get('/crossings/saveObservations', 'CrossingController@saveObservations');
+Route::post('/crossings/uploadPhoto', 'CrossingController@uploadPhoto');
+Route::get('/crossings/deleteCodify', 'CrossingController@deleteCodify');
+Route::get('/crossings/generateCodify', 'CrossingController@generateCodify');
+Route::get('/crossings/codify/{id}', 'CrossingController@codify');
+Route::get('/crossings/finishCodify/{id}', 'CrossingController@finishCodify');
+Route::get('/crossings/codedJSON/', 'CrossingController@codedJSON');
+Route::get('/crossings/items/', 'CrossingController@items');
+Route::post('/crossings/saveCodify/', 'CrossingController@saveCodify');
+Route::post('/crossings/saveCharacteristics', 'CrossingController@saveCharacteristics');
+Route::get('/crossings/check_ancester/', 'CrossingController@check_ancester');
+
+
+Route::post('/blocks/saveShowFarms','BlockController@saveShowFarms');
+Route::get('/blocks/modCaracteristicas','BlockController@modCaracteristicas');
+Route::get('/blocks/saveObservation','BlockController@saveObservation');
+Route::get('/blocks/getCaracteristicas','BlockController@getCaracteristicas');	
+Route::get('/blocks/getFotos','BlockController@getFotos');
+Route::get('/blocks/codify','BlockController@codify');
+Route::get('/blocks/print','BlockController@print');
+Route::get('/blocks/move_position','BlockController@move_position');
+Route::get('/blocks/info_to_compare','BlockController@info_to_compare');
+Route::get('/blocks/deleteCodify/{id}','BlockController@deleteCodify');
+Route::get('/blocks/getDataChar/','BlockController@getDataChar');
+Route::get('/blocks/reorder/{id}','BlockController@reorder');
+Route::get('/blocks/discard/','BlockController@discard');
+Route::get('/blocks/drop/','BlockController@drop');
+Route::get('/blocks/check_childrens/','BlockController@check_childrens');
+Route::get('/blocks/review/','BlockController@review');
+Route::get('/blocks/export/{id}','BlockController@export');
+Route::get('/blocks/send_to_blocks','BlockController@send_to_blocks');
+Route::get('/blocks/trash','BlockController@trash');
+Route::get('/blocks/show_trash/{id}','BlockController@show_trash');
+Route::get('/blocks/mark_offline/','BlockController@mark_offline');
+Route::get('/blocks/saveCalibres/','BlockController@saveCalibres');
+Route::get('/blocks/drops/{id}','BlockController@drops')->name('blocks.drops');
+Route::resource('blocks', 'BlockController');
+
+Route::get('/mapouts/generateCodify/{id}','MapoutController@generateCodify');
+Route::get('/mapouts/deleteCodify/{id}','MapoutController@deleteCodify');
+Route::post('/mapouts/updatePosition', 'MapoutController@updatePosition')->name('mapouts.updatePosition');
+Route::post('/mapouts/addPositions', 'MapoutController@addPositions')->name('mapouts.addPositions');
+Route::resource('mapouts', 'MapoutController');
+Route::resource('crossings', 'CrossingController');
+Route::resource('features', 'FeatureController');
+
+Route::get("farmers/provinces/", "FarmersController@getProvinces");
+Route::get("farmers/communities/", "FarmersController@getCommunities");
+Route::get("farmers/lands/", "FarmersController@getLands");
+
+Route::resource('farmers', 'FarmersController');
+Route::resource('companies', 'CompanyController');
+Route::resource('lands', 'LandController');
+Route::resource('traceability', 'TraceabilityController');
+Route::resource('outtraceability', 'OutTrazeabilitiesController');
+Route::get("royalties/create/{farmer_id}", "RoyaltiesController@create");
+
+Route::resource('royalties', 'RoyaltiesController');
+
+Route::get('/results/getData/','ResultsController@getData');
+Route::get('/results/getDataLegacy/','ResultsController@getDataLegacy');
+Route::get('/results/getDataBenchmark/','ResultsController@getDataBenchmark');
+Route::get('/results/crossings/','ResultsController@crossings');
+Route::get('/results/fries/','ResultsController@fries');
+Route::get('/results/searchCrossings/','CrossingController@searchCrossings');
+Route::get('/results/getVaritiesFromBlock/','ResultsController@getVaritiesFromBlock');
+Route::get('/results/getChildrensFromVarity/','ResultsController@getChildrensFromVarity');
+Route::get('/results/getCaracteristicas/','ResultsController@getCaracteristicas');
+Route::get('/results/modCaracteristicas','ResultsController@modCaracteristicas');
+Route::any('/fries/save/','BlockController@saveDataFries');			
+Route::get('/fries/getData/','BlockController@getDataFries');
+Route::any('/fries/updateFries/','BlockController@updateDataFries');			
+
+Route::get('/results/preview_report/','ResultsController@preview_report');
+Route::get('/results/load_preview/','ResultsController@load_preview');
+Route::any('/results/report/','ResultsController@report');
+Route::get('/results/getVarities/','ResultsController@varities');
+Route::get('/results/info_to_compare/','ResultsController@info_to_compare');
+Route::get('/results/compare-beta/bootstrap','ResultsController@compareBetaBootstrap');
+Route::match(['get', 'post'], '/results/compare-beta/data','ResultsController@compareBetaData');
+Route::post('/results/compare-beta/config','ResultsController@saveCompareBetaConfig');
+Route::post('/results/compare-beta/action','ResultsController@saveCompareBetaAction');
+Route::post('/results/compare-beta/save','ResultsController@saveCompareBetaSnapshot');
+Route::get('/results/compare-results','ResultsController@compareResultsIndex')->name('results.compare-results.index');
+Route::get('/results/compare-results/{id}','ResultsController@compareResultsShow')->name('results.compare-results.show');
+Route::delete('/results/compare-results/{id}','ResultsController@compareResultsDestroy')->name('results.compare-results.destroy');
+Route::get('/results/compare-results/{id}/excel','ResultsController@compareResultsExcel')->name('results.compare-results.excel');
+Route::get('/results/getBlocksByYear/','ResultsController@getBlocksByYear');
+Route::get('/results/getVarityByname/','ResultsController@getVarityByname');
+Route::get('/results/getVarityBynameInfo/','ResultsController@getVarityBynameInfo');
+Route::get('/results/getDataFeature/','ResultsController@getDataFeature');
+Route::get('/results/stadistics/','ResultsController@stadistics');
+Route::get('/results/feature-guide','FeatureGuideController@index')->name('results.feature-guide');
+
+
+
+Route::resource('results', 'ResultsController');
+
+Route::resource('std_market', 'StdMarketController');
+
+
+Route::DELETE('/greenhouse/destroy_greenhouse', 'GreenHouseController@destroy_greenhouse')->name('greenhouse.destroy_greenhouse');
+Route::PATCH('/greenhouse/update_greenhouse', 'GreenHouseController@update_greenhouse')->name('greenhouse.update_greenhouse');
+Route::get('/greenhouse/asociate_crossing/{id}','GreenHouseController@asociate_crossing')->name('greenhouse.asociate_crossing');
+Route::get('/greenhouse/crossings_add/','GreenHouseController@crossings_add');
+Route::get('/greenhouse/crossings_added/{id}','GreenHouseController@crossings_added');
+Route::post('/greenhouse/store_crossings', 'GreenHouseController@store_crossings');
+Route::post('/greenhouse/delete_crossings', 'GreenHouseController@delete_crossings');
+Route::get('/greenhouse/export/','GreenHouseController@export');
+
+
+Route::get('/greenhouse/generateCodify/{id}','GreenHouseController@generateCodify');
+Route::get('/greenhouse/show_mobile/{id}','GreenHouseController@show_mobile');
+Route::get('/greenhouse/crossings_ok/{id}','GreenHouseController@crossings_ok');
+Route::get('/greenhouse/crossings_list/{id}','GreenHouseController@crossings_list');
+Route::get('/greenhouse/show_mobile/{id}','GreenHouseController@show_mobile');
+Route::get('/public/draw_greenhouse/{id}','GreenHouseController@draw_greenhouse');
+Route::get('draw_greenhouse/{id}','GreenHouseController@draw_greenhouse');
+Route::get('/greenhouse/deleteCodify/{id}','GreenHouseController@deleteCodify');
+Route::post('/greenhouse/updatePosition', 'GreenHouseController@updatePosition')->name('greenhouse.updatePosition');
+Route::post('/greenhouse/addPositions', 'GreenHouseController@addPositions')->name('greenhouse.addPositions');
+Route::get('/greenhouse/switch/{varity_id}/{father_id}/{mother_id}','GreenHouseController@switchFathers');
+Route::get('/greenhouse/polen/{father_id}/{mother_id}/{status}','GreenHouseController@savePolen');
+Route::get('/greenhouse/berries/{id}/{nro_berries}','GreenHouseController@save_berries');
+Route::get('/greenhouse/glasses/{id}/{nro_glases}','GreenHouseController@save_glasses');
+Route::get('/greenhouse/potatoes/{id}/{nro_potatoes}','GreenHouseController@save_potatoes');
+Route::get('/greenhouse/get_data_chart','GreenHouseController@get_data_chart');
+Route::resource('greenhouse', 'GreenHouseController');
+
+Route::get('/relative_yield/calc','RelativeYieldController@calc');
+
+Route::resource('relative_yield', 'RelativeYieldController');
+
+Route::get('/users/logins', 'UserController@logins');
+Route::resource('users', 'UserController');
+
+// Journal (legacy routes)
+Route::get('/journal/{year}/{month}', 'JournalController@index')
+    ->where([
+        'year'  => '[0-9]{4}',
+        'month' => '(0?[1-9]|1[0-2])',
+    ])
+    ->name('journal.index');
+
+Route::get('/journal/day/{date}', 'JournalController@dayDetails')
+    ->where([
+        'date' => '[0-9]{4}-[0-9]{2}-[0-9]{2}',
+    ])
+    ->name('journal.day.details');
+
+Route::post('/journal/trade', 'JournalController@storeTrade')
+    ->name('journal.trade.store');
+
+Route::post('players/{player}/quick-update', 'PlayerController@quickUpdate')
+    ->name('players.quickUpdate');
+
+    Route::post('/h2h/sync', 'HomeController@sync');
+
+Route::resource('players', 'PlayerController');
+
+Route::get('/potato-vision/dashboard', 'PotatoVisionController@dashboard')->name('potato-vision.dashboard');
+Route::get('/potato-vision/dashboard/sessions/{session}/metrics', 'PotatoVisionController@dashboardMetrics')->name('potato-vision.dashboard.metrics');
